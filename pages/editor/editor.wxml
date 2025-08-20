@@ -46,7 +46,7 @@
         </view>
         
         <!-- 格子编号（调试用） -->
-        <view class="cell-number">{{index + 1}}</view>
+        <!-- <view class="cell-number">{{index + 1}}</view> -->
       </view>
     </view>
   </view>
@@ -147,6 +147,12 @@
       </view>
     </view>
   </view>
+
+  <!-- 隐藏的canvas用于生成图片 -->
+  <canvas 
+    canvas-id="puzzleCanvas" 
+    style="position: absolute; left: -9999px; top: -9999px; width: {{canvasWidth}}px; height: {{canvasHeight}}px;"
+  ></canvas>
 
   <!-- 加载提示 -->
   <view class="loading-overlay {{isLoading ? 'show' : ''}}">

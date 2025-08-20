@@ -495,39 +495,34 @@ Page({
       ctx.setFillStyle('#ffffff')
       ctx.fillRect(0, 0, this.data.canvasWidth, this.data.canvasHeight)
       
-      // 按z-index排序绘制所有元素
-      const sortedItems = [...this.data.photoItems].sort((a, b) => a.zIndex - b.zIndex)
+      // 绘制九宫格中的图片
+      const gridCells = this.data.gridCells || []
+      const cellsWithPhotos = gridCells.filter(cell => cell.photoSrc)
       
-      let loadedCount = 0
-      const totalCount = sortedItems.filter(item => !item.type).length
-      
-      if (totalCount === 0) {
+      if (cellsWithPhotos.length === 0) {
         ctx.draw(false, resolve)
         return
       }
       
-      sortedItems.forEach((item) => {
-        if (item.type === 'text') {
-          // 绘制文字
-          ctx.save()
-          ctx.translate(item.x + item.width / 2, item.y + item.height / 2)
-          ctx.rotate(item.rotation * Math.PI / 180)
-          ctx.setFillStyle(item.color)
-          ctx.setFontSize(item.fontSize)
-          ctx.fillText(item.content, -item.width / 2, 0)
-          ctx.restore()
-        } else {
-          // 绘制图片
-          ctx.save()
-          ctx.translate(item.x + item.width / 2, item.y + item.height / 2)
-          ctx.rotate(item.rotation * Math.PI / 180)
-          ctx.drawImage(item.src, -item.width / 2, -item.height / 2, item.width, item.height)
-          ctx.restore()
-          
-          loadedCount++
-          if (loadedCount === totalCount) {
-            ctx.draw(false, resolve)
-          }
+      let loadedCount = 0
+      const totalCount = cellsWithPhotos.length
+      
+      // 计算每个格子的位置和大小
+      const cellWidth = this.data.canvasWidth / 3
+      const cellHeight = this.data.canvasHeight / 3
+      
+      cellsWithPhotos.forEach((cell) => {
+        const row = Math.floor(cell.index / 3)
+        const col = cell.index % 3
+        const x = col * cellWidth
+        const y = row * cellHeight
+        
+        // 绘制图片
+        ctx.drawImage(cell.photoSrc, x, y, cellWidth, cellHeight)
+        
+        loadedCount++
+        if (loadedCount === totalCount) {
+          ctx.draw(false, resolve)
         }
       })
     })

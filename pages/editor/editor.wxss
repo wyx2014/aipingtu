@@ -157,18 +157,6 @@
   text-align: center;
 }
 
-/* 格子编号 */
-.cell-number {
-  position: absolute;
-  top: 4rpx;
-  left: 4rpx;
-  background: rgba(0, 0, 0, 0.5);
-  color: white;
-  font-size: 20rpx;
-  padding: 2rpx 6rpx;
-  border-radius: 4rpx;
-  z-index: 10;
-}
 
 /* 控制点 */
 .control-points {
