@@ -1,0 +1,378 @@
+/**editor.wxss**/
+.container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f5f5f5;
+}
+
+/* 顶部工具栏 */
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 88rpx;
+  background: white;
+  border-bottom: 1rpx solid #e9ecef;
+  padding: 0 30rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+}
+
+.toolbar-left,
+.toolbar-right {
+  flex: 1;
+}
+
+.toolbar-center {
+  flex: 2;
+  text-align: center;
+}
+
+.back-btn {
+  color: #007aff;
+  font-size: 32rpx;
+}
+
+.title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.save-btn {
+  color: #007aff;
+  font-size: 28rpx;
+  text-align: right;
+  display: block;
+}
+
+/* 画布容器 */
+.canvas-container {
+  flex: 1;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f8f9fa;
+  overflow: hidden;
+}
+
+.puzzle-canvas {
+  background: white;
+  border-radius: 20rpx;
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.1);
+}
+
+/* 拖拽层 */
+.drag-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.photo-item {
+  position: absolute;
+  border: 2rpx solid transparent;
+  border-radius: 8rpx;
+  overflow: hidden;
+  pointer-events: auto;
+  transition: border-color 0.2s;
+}
+
+.photo-item.selected {
+  border-color: #007aff;
+}
+
+.photo-image {
+  border-radius: 6rpx;
+}
+
+/* 控制点 */
+.control-points {
+  position: absolute;
+  top: -10rpx;
+  left: -10rpx;
+  right: -10rpx;
+  bottom: -10rpx;
+  pointer-events: none;
+}
+
+.control-point {
+  position: absolute;
+  width: 20rpx;
+  height: 20rpx;
+  background: #007aff;
+  border: 2rpx solid white;
+  border-radius: 50%;
+  pointer-events: auto;
+}
+
+.resize-point {
+  bottom: -10rpx;
+  right: -10rpx;
+  cursor: se-resize;
+}
+
+.rotate-point {
+  top: -10rpx;
+  right: -10rpx;
+  background: #28a745;
+  cursor: grab;
+}
+
+.delete-point {
+  top: -10rpx;
+  left: -10rpx;
+  background: #dc3545;
+  color: white;
+  font-size: 12rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+/* 底部工具栏 */
+.bottom-toolbar {
+  background: white;
+  border-top: 1rpx solid #e9ecef;
+  padding: 20rpx;
+}
+
+.photo-list {
+  height: 120rpx;
+  margin-bottom: 20rpx;
+  white-space: nowrap;
+}
+
+.photo-thumb {
+  display: inline-block;
+  width: 100rpx;
+  height: 100rpx;
+  margin-right: 20rpx;
+  border-radius: 12rpx;
+  overflow: hidden;
+  border: 2rpx solid #dee2e6;
+}
+
+.thumb-image {
+  width: 100%;
+  height: 100%;
+}
+
+.function-buttons {
+  display: flex;
+  justify-content: space-around;
+}
+
+.func-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20rpx;
+  border-radius: 12rpx;
+  background: #f8f9fa;
+  min-width: 120rpx;
+}
+
+.func-icon {
+  font-size: 32rpx;
+  margin-bottom: 8rpx;
+  color: #007aff;
+}
+
+.func-label {
+  font-size: 24rpx;
+  color: #666;
+}
+
+/* 模态框通用样式 */
+.filter-modal,
+.text-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s;
+}
+
+.filter-modal.show,
+.text-modal.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 20rpx 20rpx 0 0;
+  width: 100%;
+  max-height: 80vh;
+  transform: translateY(100%);
+  transition: transform 0.3s;
+}
+
+.filter-modal.show .modal-content,
+.text-modal.show .modal-content {
+  transform: translateY(0);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #e9ecef;
+}
+
+.modal-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.close-btn {
+  font-size: 40rpx;
+  color: #999;
+  width: 40rpx;
+  height: 40rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 滤镜选择 */
+.filter-list {
+  padding: 30rpx;
+  white-space: nowrap;
+}
+
+.filter-item {
+  display: inline-block;
+  text-align: center;
+  margin-right: 30rpx;
+  vertical-align: top;
+}
+
+.filter-item.active .filter-preview {
+  border-color: #007aff;
+}
+
+.filter-preview {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 12rpx;
+  border: 3rpx solid #dee2e6;
+  margin-bottom: 10rpx;
+  background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+}
+
+.filter-name {
+  font-size: 24rpx;
+  color: #666;
+}
+
+/* 文字编辑 */
+.text-input-area {
+  padding: 30rpx;
+}
+
+.text-input {
+  width: 100%;
+  min-height: 200rpx;
+  border: 1rpx solid #dee2e6;
+  border-radius: 12rpx;
+  padding: 20rpx;
+  font-size: 28rpx;
+  margin-bottom: 30rpx;
+  box-sizing: border-box;
+}
+
+.text-style-options {
+  margin-bottom: 30rpx;
+}
+
+.style-group {
+  margin-bottom: 30rpx;
+}
+
+.style-label {
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 20rpx;
+  display: block;
+}
+
+.color-options {
+  display: flex;
+  gap: 20rpx;
+}
+
+.color-item {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 50%;
+  border: 3rpx solid transparent;
+}
+
+.color-item.active {
+  border-color: #007aff;
+}
+
+.size-slider {
+  width: 100%;
+}
+
+.confirm-btn {
+  width: 100%;
+  height: 80rpx;
+  background: #007aff;
+  color: white;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  border: none;
+}
+
+/* 加载提示 */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s;
+}
+
+.loading-overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.loading-content {
+  background: white;
+  padding: 60rpx 80rpx;
+  border-radius: 20rpx;
+  text-align: center;
+}
+
+.loading-text {
+  font-size: 28rpx;
+  color: #333;
+}

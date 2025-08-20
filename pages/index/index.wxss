@@ -1,0 +1,201 @@
+/**index.wxss**/
+.container {
+  padding: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+}
+
+.header {
+  text-align: center;
+  padding: 60rpx 0 40rpx;
+  color: white;
+}
+
+.title {
+  display: block;
+  font-size: 48rpx;
+  font-weight: bold;
+  margin-bottom: 10rpx;
+}
+
+.subtitle {
+  font-size: 28rpx;
+  opacity: 0.8;
+}
+
+.main-content {
+  padding: 0 10rpx;
+  max-width: 750rpx;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30rpx;
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.count {
+  font-size: 24rpx;
+  color: #999;
+  font-weight: normal;
+}
+
+/* 照片选择区域 */
+.photo-section {
+  margin-bottom: 30rpx;
+}
+
+.card {
+  background: white;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.1);
+  margin-bottom: 30rpx;
+}
+
+.photo-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+}
+
+.photo-item {
+  width: 200rpx;
+  height: 200rpx;
+  border-radius: 20rpx;
+  position: relative;
+  overflow: hidden;
+}
+
+.add-photo {
+  background: #f8f9fa;
+  border: 2rpx dashed #dee2e6;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #6c757d;
+}
+
+.add-icon {
+  font-size: 48rpx;
+  margin-bottom: 10rpx;
+}
+
+.add-text {
+  font-size: 24rpx;
+}
+
+.photo-preview {
+  width: 100%;
+  height: 100%;
+}
+
+.delete-btn {
+  position: absolute;
+  top: 10rpx;
+  right: 10rpx;
+  width: 40rpx;
+  height: 40rpx;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24rpx;
+}
+
+/* 模板选择区域 */
+.template-section {
+  margin-bottom: 40rpx;
+}
+
+.template-scroll {
+  white-space: nowrap;
+  width: 100%;
+  overflow-x: auto;
+}
+
+.template-item {
+  display: inline-block;
+  margin-right: 20rpx;
+  text-align: center;
+  vertical-align: top;
+}
+
+.template-item.active .template-preview {
+  border: 4rpx solid #007aff;
+}
+
+.template-preview {
+  width: 160rpx;
+  height: 200rpx;
+  background: white;
+  border-radius: 16rpx;
+  border: 2rpx solid #e9ecef;
+  margin-bottom: 10rpx;
+  overflow: hidden;
+  position: relative;
+}
+
+.template-grid {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  padding: 8rpx;
+  box-sizing: border-box;
+}
+
+.grid-cell {
+  background: #f8f9fa;
+  border: 1rpx solid #dee2e6;
+  border-radius: 4rpx;
+}
+
+.template-name {
+  font-size: 24rpx;
+  color: #666;
+}
+
+/* 操作按钮 */
+.action-section {
+  text-align: center;
+  margin-bottom: 40rpx;
+}
+
+.start-btn {
+  width: 300rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+  color: white;
+  border-radius: 40rpx;
+  font-size: 32rpx;
+  font-weight: bold;
+  border: none;
+  box-shadow: 0 8rpx 20rpx rgba(255, 107, 107, 0.3);
+}
+
+.start-btn[disabled] {
+  background: #ccc;
+  box-shadow: none;
+}
+
+.footer {
+  text-align: center;
+  padding: 40rpx 0;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.tip {
+  font-size: 24rpx;
+}

@@ -1,0 +1,159 @@
+<!--editor.wxml-->
+<view class="container">
+  <!-- 顶部工具栏 -->
+  <view class="toolbar">
+    <view class="toolbar-left">
+      <text class="back-btn" bindtap="goBack">‹ 返回</text>
+    </view>
+    <view class="toolbar-center">
+      <text class="title">编辑拼图</text>
+    </view>
+    <view class="toolbar-right">
+      <text class="save-btn" bindtap="savePuzzle">保存</text>
+    </view>
+  </view>
+
+  <!-- 画布区域 -->
+  <view class="canvas-container">
+    <canvas 
+      canvas-id="puzzleCanvas" 
+      class="puzzle-canvas"
+      style="width: {{canvasWidth}}px; height: {{canvasHeight}}px;"
+      bindtouchstart="onTouchStart"
+      bindtouchmove="onTouchMove"
+      bindtouchend="onTouchEnd">
+    </canvas>
+    
+    <!-- 拖拽层 -->
+    <view class="drag-layer">
+      <view 
+        class="photo-item {{item.selected ? 'selected' : ''}}"
+        wx:for="{{photoItems}}" 
+        wx:key="id"
+        style="left: {{item.x}}px; top: {{item.y}}px; width: {{item.width}}px; height: {{item.height}}px; transform: rotate({{item.rotation}}deg);"
+        bindtouchstart="onPhotoTouchStart"
+        bindtouchmove="onPhotoTouchMove"
+        bindtouchend="onPhotoTouchEnd"
+        data-index="{{index}}">
+        
+        <image 
+          src="{{item.src}}" 
+          mode="aspectFill"
+          class="photo-image"
+          style="width: 100%; height: 100%;"
+        ></image>
+        
+        <!-- 选中状态的控制点 -->
+        <view wx:if="{{item.selected}}" class="control-points">
+          <view class="control-point resize-point" data-type="resize" data-index="{{index}}"></view>
+          <view class="control-point rotate-point" data-type="rotate" data-index="{{index}}"></view>
+          <view class="control-point delete-point" data-type="delete" data-index="{{index}}" bindtap="deletePhotoItem">×</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部工具栏 -->
+  <view class="bottom-toolbar">
+    <!-- 照片列表 -->
+    <scroll-view class="photo-list" scroll-x="true">
+      <view class="photo-thumb" wx:for="{{remainingPhotos}}" wx:key="index" bindtap="addPhotoToCanvas" data-src="{{item}}">
+        <image src="{{item}}" mode="aspectFill" class="thumb-image"></image>
+      </view>
+    </scroll-view>
+    
+    <!-- 功能按钮 -->
+    <view class="function-buttons">
+      <view class="func-btn" bindtap="addText">
+        <text class="func-icon">T</text>
+        <text class="func-label">文字</text>
+      </view>
+      
+      <view class="func-btn" bindtap="addSticker">
+        <text class="func-icon">☆</text>
+        <text class="func-label">贴纸</text>
+      </view>
+      
+      <view class="func-btn" bindtap="applyFilter">
+        <text class="func-icon">◐</text>
+        <text class="func-label">滤镜</text>
+      </view>
+      
+      <view class="func-btn" bindtap="adjustBackground">
+        <text class="func-icon">⬜</text>
+        <text class="func-label">背景</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 滤镜选择弹窗 -->
+  <view class="filter-modal {{showFilterModal ? 'show' : ''}}">
+    <view class="modal-content">
+      <view class="modal-header">
+        <text class="modal-title">选择滤镜</text>
+        <text class="close-btn" bindtap="closeFilterModal">×</text>
+      </view>
+      <scroll-view class="filter-list" scroll-x="true">
+        <view class="filter-item {{currentFilter === item.name ? 'active' : ''}}" 
+              wx:for="{{filters}}" 
+              wx:key="name"
+              bindtap="selectFilter"
+              data-filter="{{item.name}}">
+          <view class="filter-preview" style="{{item.style}}"></view>
+          <text class="filter-name">{{item.label}}</text>
+        </view>
+      </scroll-view>
+    </view>
+  </view>
+
+  <!-- 文字编辑弹窗 -->
+  <view class="text-modal {{showTextModal ? 'show' : ''}}">
+    <view class="modal-content">
+      <view class="modal-header">
+        <text class="modal-title">添加文字</text>
+        <text class="close-btn" bindtap="closeTextModal">×</text>
+      </view>
+      <view class="text-input-area">
+        <textarea 
+          placeholder="请输入文字内容" 
+          value="{{textContent}}"
+          bindinput="onTextInput"
+          class="text-input"
+          maxlength="100">
+        </textarea>
+        <view class="text-style-options">
+          <view class="style-group">
+            <text class="style-label">颜色:</text>
+            <view class="color-options">
+              <view class="color-item {{textColor === item ? 'active' : ''}}" 
+                    wx:for="{{textColors}}" 
+                    wx:key="*this"
+                    style="background-color: {{item}};"
+                    bindtap="selectTextColor"
+                    data-color="{{item}}">
+              </view>
+            </view>
+          </view>
+          <view class="style-group">
+            <text class="style-label">大小:</text>
+            <slider 
+              value="{{textSize}}" 
+              min="20" 
+              max="80" 
+              bindchange="onTextSizeChange"
+              class="size-slider">
+            </slider>
+          </view>
+        </view>
+        <button class="confirm-btn" bindtap="confirmAddText">确定</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 加载提示 -->
+  <view class="loading-overlay {{isLoading ? 'show' : ''}}">
+    <view class="loading-content">
+      <text class="loading-text">{{loadingText}}</text>
+    </view>
+  </view>
+</view>

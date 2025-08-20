@@ -1,0 +1,65 @@
+<!--index.wxml-->
+<view class="container">
+  <!-- 头部标题 -->
+  <view class="header">
+    <text class="title">创意拼图</text>
+    <text class="subtitle">让你的照片更有趣</text>
+  </view>
+
+  <!-- 功能区域 -->
+  <view class="main-content">
+    <!-- 选择照片按钮 -->
+    <view class="photo-section card">
+      <view class="section-title">
+        <text>选择照片</text>
+        <text class="count">{{selectedPhotos.length}}/9</text>
+      </view>
+      
+      <view class="photo-grid">
+        <view class="photo-item add-photo" bindtap="chooseImage">
+          <text class="add-icon">+</text>
+          <text class="add-text">添加照片</text>
+        </view>
+        
+        <view class="photo-item" wx:for="{{selectedPhotos}}" wx:key="index">
+          <image src="{{item}}" mode="aspectFill" class="photo-preview"></image>
+          <view class="delete-btn" bindtap="deletePhoto" data-index="{{index}}">×</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 模板选择 -->
+    <view class="template-section card">
+      <view class="section-title">
+        <text>选择模板</text>
+      </view>
+      
+      <scroll-view class="template-scroll" scroll-x="true">
+        <view class="template-item {{currentTemplate === index ? 'active' : ''}}" 
+              wx:for="{{templates}}" 
+              wx:key="index"
+              bindtap="selectTemplate"
+              data-index="{{index}}">
+          <view class="template-preview" style="{{item.style}}">
+            <view class="template-grid">
+              <view class="grid-cell" wx:for="{{item.cells}}" wx:for-item="cell" wx:key="cellIndex" style="{{cell.style}}"></view>
+            </view>
+          </view>
+          <text class="template-name">{{item.name}}</text>
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- 开始创作按钮 -->
+    <view class="action-section">
+      <button class="start-btn" bindtap="startCreate">
+        开始创作
+      </button>
+    </view>
+  </view>
+
+  <!-- 底部说明 -->
+  <view class="footer">
+    <text class="tip">选择照片和模板后即可开始创作</text>
+  </view>
+</view>

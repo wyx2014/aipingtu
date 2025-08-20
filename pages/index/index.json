@@ -1,0 +1,9 @@
+{
+  "usingComponents": {},
+  "navigationBarTitleText": "创意拼图",
+  "navigationBarBackgroundColor": "#667eea",
+  "navigationBarTextStyle": "white",
+  "backgroundColor": "#667eea",
+  "backgroundTextStyle": "light",
+  "enablePullDownRefresh": false
+}
