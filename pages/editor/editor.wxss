@@ -444,3 +444,147 @@
   font-size: 28rpx;
   color: #333;
 }
+
+/* 图片裁剪模态框样式 */
+.crop-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.crop-modal.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.crop-modal-content {
+  background: white;
+  border-radius: 20rpx;
+  width: 90%;
+  max-width: 700rpx;
+  max-height: 80%;
+  overflow: hidden;
+}
+
+.crop-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx 40rpx;
+  border-bottom: 1px solid #eee;
+}
+
+.crop-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.crop-container {
+  padding: 40rpx;
+}
+
+.crop-image-wrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 40rpx;
+}
+
+.crop-image {
+  display: block;
+  border-radius: 10rpx;
+}
+
+.crop-box {
+  position: absolute;
+  background: rgba(0, 122, 255, 0.1);
+  pointer-events: auto;
+  cursor: move;
+}
+
+.crop-border {
+  position: absolute;
+  top: 0px;
+  left: 4px;
+  right: -4px;
+  bottom: 0px;
+  border: 2px solid #007aff;
+  border-radius: 4rpx;
+  pointer-events: none;
+}
+
+.crop-move-area {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 122, 255, 0.1);
+}
+
+.crop-hint {
+  font-size: 24rpx;
+  color: #007aff;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 8rpx 16rpx;
+  border-radius: 20rpx;
+  pointer-events: none;
+}
+
+.crop-controls {
+  margin-bottom: 40rpx;
+}
+
+.control-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.control-label {
+  font-size: 28rpx;
+  color: #666;
+  margin-right: 20rpx;
+  min-width: 80rpx;
+}
+
+.crop-slider {
+  flex: 1;
+}
+
+.crop-actions {
+  display: flex;
+  gap: 20rpx;
+}
+
+.crop-btn {
+  flex: 1;
+  height: 80rpx;
+  border-radius: 40rpx;
+  font-size: 32rpx;
+  border: none;
+}
+
+.cancel-btn {
+  background: #f8f9fa;
+  color: #666;
+}
+
+.confirm-btn {
+  background: #007aff;
+  color: white;
+}

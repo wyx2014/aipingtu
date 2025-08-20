@@ -51,99 +51,40 @@
     </view>
   </view>
 
-  <!-- 底部工具栏 -->
-  <view class="bottom-toolbar">
-    <!-- 照片列表 -->
-    <scroll-view class="photo-list" scroll-x="true">
-      <view class="photo-thumb" wx:for="{{remainingPhotos}}" wx:key="index" bindtap="addPhotoToCanvas" data-src="{{item}}">
-        <image src="{{item}}" mode="aspectFill" class="thumb-image"></image>
-      </view>
-    </scroll-view>
-    
-    <!-- 功能按钮 -->
-    <view class="function-buttons">
-      <view class="func-btn" bindtap="addText">
-        <text class="func-icon">T</text>
-        <text class="func-label">文字</text>
-      </view>
-      
-      <view class="func-btn" bindtap="addSticker">
-        <text class="func-icon">☆</text>
-        <text class="func-label">贴纸</text>
-      </view>
-      
-      <view class="func-btn" bindtap="applyFilter">
-        <text class="func-icon">◐</text>
-        <text class="func-label">滤镜</text>
-      </view>
-      
-      <view class="func-btn" bindtap="adjustBackground">
-        <text class="func-icon">⬜</text>
-        <text class="func-label">背景</text>
-      </view>
-    </view>
-  </view>
 
-  <!-- 滤镜选择弹窗 -->
-  <view class="filter-modal {{showFilterModal ? 'show' : ''}}">
-    <view class="modal-content">
-      <view class="modal-header">
-        <text class="modal-title">选择滤镜</text>
-        <text class="close-btn" bindtap="closeFilterModal">×</text>
+  <!-- 图片裁剪弹窗 -->
+  <view class="crop-modal {{showCropModal ? 'show' : ''}}">
+    <view class="crop-modal-content">
+      <view class="crop-header">
+        <text class="crop-title">裁剪</text>
+        <text class="close-btn" bindtap="closeCropModal">×</text>
       </view>
-      <scroll-view class="filter-list" scroll-x="true">
-        <view class="filter-item {{currentFilter === item.name ? 'active' : ''}}" 
-              wx:for="{{filters}}" 
-              wx:key="name"
-              bindtap="selectFilter"
-              data-filter="{{item.name}}">
-          <view class="filter-preview" style="{{item.style}}"></view>
-          <text class="filter-name">{{item.label}}</text>
-        </view>
-      </scroll-view>
-    </view>
-  </view>
-
-  <!-- 文字编辑弹窗 -->
-  <view class="text-modal {{showTextModal ? 'show' : ''}}">
-    <view class="modal-content">
-      <view class="modal-header">
-        <text class="modal-title">添加文字</text>
-        <text class="close-btn" bindtap="closeTextModal">×</text>
-      </view>
-      <view class="text-input-area">
-        <textarea 
-          placeholder="请输入文字内容" 
-          value="{{textContent}}"
-          bindinput="onTextInput"
-          class="text-input"
-          maxlength="100">
-        </textarea>
-        <view class="text-style-options">
-          <view class="style-group">
-            <text class="style-label">颜色:</text>
-            <view class="color-options">
-              <view class="color-item {{textColor === item ? 'active' : ''}}" 
-                    wx:for="{{textColors}}" 
-                    wx:key="*this"
-                    style="background-color: {{item}};"
-                    bindtap="selectTextColor"
-                    data-color="{{item}}">
-              </view>
-            </view>
-          </view>
-          <view class="style-group">
-            <text class="style-label">大小:</text>
-            <slider 
-              value="{{textSize}}" 
-              min="20" 
-              max="80" 
-              bindchange="onTextSizeChange"
-              class="size-slider">
-            </slider>
+      
+      <view class="crop-container">
+        <view class="crop-image-wrapper">
+          <image 
+            src="{{cropImageSrc}}" 
+            mode="widthFix"
+            class="crop-image"
+            style="width: 100%; max-width: 300px; transform: scale({{cropScale}}); transform-origin: center;"
+          ></image>
+          
+          <!-- 裁剪框 -->
+          <view 
+            class="crop-box"
+            style="left: {{cropX * 300 / imageWidth * cropScale}}px; top: {{cropY * 300 / imageWidth * cropScale}}px; width: {{cropWidth * 300 / imageWidth}}px; height: {{cropHeight * 300 / imageWidth}}px;"
+            bindtouchstart="onCropTouchStart"
+            bindtouchmove="onCropTouchMove"
+            bindtouchend="onCropTouchEnd"
+          >
+            <view class="crop-border"></view>
           </view>
         </view>
-        <button class="confirm-btn" bindtap="confirmAddText">确定</button>
+        
+        <!-- 操作按钮 -->
+        <view class="crop-actions">
+          <button class="crop-btn confirm-btn" bindtap="confirmCrop">确定</button>
+        </view>
       </view>
     </view>
   </view>
@@ -153,6 +94,13 @@
     type="2d" 
     id="puzzleCanvas" 
     style="position: absolute; left: -9999px; top: -9999px; width: {{canvasWidth}}px; height: {{canvasHeight}}px;"
+  ></canvas>
+  
+  <!-- 隐藏的canvas用于图片裁剪 -->
+  <canvas 
+    type="2d" 
+    id="cropCanvas" 
+    style="position: absolute; left: -9999px; top: -9999px; width: 300px; height: 300px;"
   ></canvas>
 
   <!-- 加载提示 -->

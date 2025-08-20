@@ -36,7 +36,7 @@
       
       <scroll-view class="template-scroll" scroll-x="true">
         <view class="template-item {{currentTemplate === index ? 'active' : ''}}" 
-              wx:for="{{templates}}" 
+              wx:for="{{filteredTemplates}}" 
               wx:key="index"
               bindtap="selectTemplate"
               data-index="{{index}}">

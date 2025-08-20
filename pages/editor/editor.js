@@ -11,6 +11,7 @@ Page({
     draggingCell: -1,
     dragOverCell: -1,
     touchStartTime: 0,
+    lastTapTime: 0, // 用于双击检测
     
     // 滤镜相关
     showFilterModal: false,
@@ -29,6 +30,20 @@ Page({
     textColor: '#000000',
     textSize: 40,
     textColors: ['#000000', '#ffffff', '#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#f0932b', '#eb4d4b'],
+    
+    // 图片裁剪相关
+    showCropModal: false,
+    cropImageSrc: '',
+    cropCellIndex: -1,
+    cropX: 0,
+    cropY: 0,
+    cropWidth: 100,
+    cropHeight: 100,
+    imageWidth: 0,
+    imageHeight: 0,
+    cropScale: 1,
+    originalCropWidth: 100,
+    originalCropHeight: 100,
     
     // 加载状态
     isLoading: false,
@@ -128,7 +143,8 @@ Page({
       gridCells.push({
         index: i,
         class: cell.class || '',
-        photoSrc: photo
+        photoSrc: photo,
+        originalPhotoSrc: photo // 保存原始图片路径
       })
     }
     
@@ -203,14 +219,229 @@ Page({
   onCellTap(e) {
     const cellIndex = e.currentTarget.dataset.cellIndex
     const touchEndTime = Date.now()
+    const timeSinceLastTap = touchEndTime - this.data.lastTapTime
     
-    // 如果是快速点击（不是拖拽），则选择照片
+    // 如果是快速点击（不是拖拽）
     if (touchEndTime - this.data.touchStartTime < 200) {
-      this.selectCellPhoto(cellIndex)
+      // 检测双击（两次点击间隔小于300ms）
+      if (timeSinceLastTap < 300 && timeSinceLastTap > 50) {
+        this.onCellDoubleTap(cellIndex)
+      } else {
+        this.selectCellPhoto(cellIndex)
+      }
+    }
+    
+    // 更新最后点击时间
+    this.setData({
+      lastTapTime: touchEndTime
+    })
+  },
+
+  // 双击格子事件
+  onCellDoubleTap(cellIndex) {
+    const cell = this.data.gridCells[cellIndex]
+    
+    if (cell.photoSrc) {
+      // 有图片，打开裁剪工具，使用原始图片
+      const imageSrc = cell.originalPhotoSrc || cell.photoSrc
+      this.openCropTool(cellIndex, imageSrc)
+    } else {
+      // 空格子，选择照片
+      this.addPhotoToCell(cellIndex)
     }
   },
 
-  // 选中照片
+  // 打开图片裁剪工具
+  openCropTool(cellIndex, imageSrc) {
+    // 获取图片尺寸
+    wx.getImageInfo({
+      src: imageSrc,
+      success: (res) => {
+        const imageWidth = res.width
+        const imageHeight = res.height
+        
+        // 格子是正方形，所以裁剪框也应该是正方形（1:1比例）
+        const cellAspectRatio = 1 // 格子宽高比为1:1
+        
+        // 计算当前aspectFill模式下图片的显示区域
+        // aspectFill会保持图片宽高比，裁剪多余部分，填满容器
+        const imageAspectRatio = imageWidth / imageHeight
+        let displayWidth, displayHeight, offsetX, offsetY
+        
+        if (imageAspectRatio > cellAspectRatio) {
+          // 图片更宽，以高度为准，左右裁剪
+          displayHeight = imageHeight
+          displayWidth = imageHeight * cellAspectRatio
+          offsetX = (imageWidth - displayWidth) / 2
+          offsetY = 0
+        } else {
+          // 图片更高，以宽度为准，上下裁剪
+          displayWidth = imageWidth
+          displayHeight = imageWidth / cellAspectRatio
+          offsetX = 0
+          offsetY = (imageHeight - displayHeight) / 2
+        }
+        
+        this.setData({
+          showCropModal: true,
+          cropImageSrc: imageSrc,
+          cropCellIndex: cellIndex,
+          imageWidth: imageWidth,
+          imageHeight: imageHeight,
+          cropX: offsetX,
+          cropY: offsetY,
+          cropWidth: displayWidth,
+          cropHeight: displayHeight,
+          cropScale: 1,
+          originalCropWidth: displayWidth,
+          originalCropHeight: displayHeight
+        })
+      },
+      fail: (err) => {
+        console.error('获取图片信息失败:', err)
+        wx.showToast({
+          title: '图片加载失败',
+          icon: 'none'
+        })
+      }
+    })
+  },
+
+  // 关闭裁剪工具
+  closeCropModal() {
+    this.setData({
+      showCropModal: false,
+      cropImageSrc: '',
+      cropCellIndex: -1
+    })
+  },
+
+  // 裁剪框触摸开始
+  onCropTouchStart(e) {
+    const touch = e.touches[0]
+    this.cropTouchStart = {
+      x: touch.clientX,
+      y: touch.clientY,
+      cropX: this.data.cropX,
+      cropY: this.data.cropY
+    }
+  },
+
+  // 裁剪框触摸移动
+  onCropTouchMove(e) {
+    if (!this.cropTouchStart) return
+    
+    const touch = e.touches[0]
+    // 考虑图片缩放后的坐标变换
+    const displayScale = 300 / this.data.imageWidth
+    const totalScale = displayScale * this.data.cropScale
+    const deltaX = (touch.clientX - this.cropTouchStart.x) / totalScale
+    const deltaY = (touch.clientY - this.cropTouchStart.y) / totalScale
+    
+    const newX = this.cropTouchStart.cropX + deltaX
+    const newY = this.cropTouchStart.cropY + deltaY
+    
+    const maxX = this.data.imageWidth - this.data.cropWidth
+    const maxY = this.data.imageHeight - this.data.cropHeight
+    
+    this.setData({
+      cropX: Math.max(0, Math.min(maxX, newX)),
+      cropY: Math.max(0, Math.min(maxY, newY))
+    })
+  },
+
+  // 裁剪框触摸结束
+  onCropTouchEnd(e) {
+    this.cropTouchStart = null
+  },
+
+  // 图片缩放（裁剪框大小保持不变）
+  onCropScale(e) {
+    const scale = e.detail.value
+    
+    // 缩放的是图片，裁剪框大小保持原始大小
+    const newCropWidth = this.data.originalCropWidth / scale
+    const newCropHeight = this.data.originalCropHeight / scale
+    
+    // 保持裁剪框中心位置
+    const centerX = this.data.cropX + this.data.cropWidth / 2
+    const centerY = this.data.cropY + this.data.cropHeight / 2
+    
+    const newX = centerX - newCropWidth / 2
+    const newY = centerY - newCropHeight / 2
+    
+    // 确保裁剪框不超出图片边界
+    const maxX = this.data.imageWidth - newCropWidth
+    const maxY = this.data.imageHeight - newCropHeight
+    
+    this.setData({
+      cropScale: scale,
+      cropWidth: newCropWidth,
+      cropHeight: newCropHeight,
+      cropX: Math.max(0, Math.min(maxX, newX)),
+      cropY: Math.max(0, Math.min(maxY, newY))
+    })
+  },
+
+  // 确认裁剪
+  confirmCrop() {
+    const { cropImageSrc, cropX, cropY, cropWidth, cropHeight, cropCellIndex } = this.data
+    
+    // 使用canvas进行图片裁剪
+    const query = wx.createSelectorQuery().in(this)
+    query.select('#cropCanvas')
+      .fields({ node: true, size: true })
+      .exec((res) => {
+        const canvas = res[0]
+        const canvasNode = canvas.node
+        const ctx = canvasNode.getContext('2d')
+        
+        // 设置canvas尺寸
+        canvasNode.width = cropWidth
+        canvasNode.height = cropHeight
+        
+        // 创建图片对象
+        const img = canvasNode.createImage()
+        img.onload = () => {
+          // 绘制裁剪后的图片
+          ctx.drawImage(img, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight)
+          
+          // 导出裁剪后的图片
+          wx.canvasToTempFilePath({
+            canvas: canvasNode,
+            success: (res) => {
+              // 更新格子中的图片，但保留原始图片路径
+              const gridCells = [...this.data.gridCells]
+              gridCells[cropCellIndex].photoSrc = res.tempFilePath
+              // 确保originalPhotoSrc存在，如果不存在则设置为当前的photoSrc
+              if (!gridCells[cropCellIndex].originalPhotoSrc) {
+                gridCells[cropCellIndex].originalPhotoSrc = cropImageSrc
+              }
+              
+              this.setData({
+                gridCells: gridCells
+              })
+              
+              this.closeCropModal()
+              
+              wx.showToast({
+                title: '裁剪成功',
+                icon: 'success'
+              })
+            },
+            fail: (err) => {
+              console.error('裁剪失败:', err)
+              wx.showToast({
+                title: '裁剪失败',
+                icon: 'none'
+              })
+            }
+          })
+        }
+        img.src = cropImageSrc
+      })
+  },
+
   // 检测拖拽悬停的格子
   detectDragOverCell(clientX, clientY) {
     // 简化实现：根据触摸位置计算目标格子
@@ -237,10 +468,14 @@ Page({
     const gridCells = [...this.data.gridCells]
     const fromPhoto = gridCells[fromIndex].photoSrc
     const toPhoto = gridCells[toIndex].photoSrc
+    const fromOriginalPhoto = gridCells[fromIndex].originalPhotoSrc
+    const toOriginalPhoto = gridCells[toIndex].originalPhotoSrc
     
-    // 交换图片
+    // 交换图片和原始图片
     gridCells[fromIndex].photoSrc = toPhoto
     gridCells[toIndex].photoSrc = fromPhoto
+    gridCells[fromIndex].originalPhotoSrc = toOriginalPhoto
+    gridCells[toIndex].originalPhotoSrc = fromOriginalPhoto
     
     this.setData({
       gridCells
@@ -277,7 +512,9 @@ Page({
       const gridCells = [...this.data.gridCells]
       const newRemainingPhotos = [...remainingPhotos]
       
-      gridCells[cellIndex].photoSrc = newRemainingPhotos.shift()
+      const photoSrc = newRemainingPhotos.shift()
+      gridCells[cellIndex].photoSrc = photoSrc
+      gridCells[cellIndex].originalPhotoSrc = photoSrc // 同时设置原始图片路径
       
       this.setData({
         gridCells,
@@ -319,6 +556,7 @@ Page({
       const deletedPhoto = gridCells[cellIndex].photoSrc
       remainingPhotos.push(deletedPhoto)
       gridCells[cellIndex].photoSrc = null
+      gridCells[cellIndex].originalPhotoSrc = null // 同时清除原始图片路径
       
       this.setData({
         gridCells,
