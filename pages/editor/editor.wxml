@@ -6,49 +6,47 @@
       <text class="back-btn" bindtap="goBack">‹ 返回</text>
     </view>
     <view class="toolbar-center">
-      <text class="title">编辑拼图</text>
+      <!-- <text class="title">开始创作吧</text> -->
     </view>
     <view class="toolbar-right">
       <text class="save-btn" bindtap="savePuzzle">保存</text>
     </view>
   </view>
 
-  <!-- 画布区域 -->
-  <view class="canvas-container">
-    <canvas 
-      canvas-id="puzzleCanvas" 
-      class="puzzle-canvas"
-      style="width: {{canvasWidth}}px; height: {{canvasHeight}}px;"
-      bindtouchstart="onTouchStart"
-      bindtouchmove="onTouchMove"
-      bindtouchend="onTouchEnd">
-    </canvas>
-    
-    <!-- 拖拽层 -->
-    <view class="drag-layer">
+  <!-- 九宫格编辑区域 -->
+  <view class="grid-editor-container">
+    <view class="grid-template {{currentTemplate.gridClass}}" style="width: {{canvasWidth}}px; height: {{canvasHeight}}px;">
       <view 
-        class="photo-item {{item.selected ? 'selected' : ''}}"
-        wx:for="{{photoItems}}" 
-        wx:key="id"
-        style="left: {{item.x}}px; top: {{item.y}}px; width: {{item.width}}px; height: {{item.height}}px; transform: rotate({{item.rotation}}deg);"
-        bindtouchstart="onPhotoTouchStart"
-        bindtouchmove="onPhotoTouchMove"
-        bindtouchend="onPhotoTouchEnd"
-        data-index="{{index}}">
+        class="grid-cell {{item.class || ''}} {{dragOverCell === index ? 'drag-over' : ''}}"
+        wx:for="{{gridCells}}" 
+        wx:key="index"
+        data-cell-index="{{index}}"
+        bindtouchstart="onCellTouchStart"
+        bindtouchmove="onCellTouchMove"
+        bindtouchend="onCellTouchEnd"
+        bindtap="onCellTap">
         
-        <image 
-          src="{{item.src}}" 
-          mode="aspectFill"
-          class="photo-image"
-          style="width: 100%; height: 100%;"
-        ></image>
-        
-        <!-- 选中状态的控制点 -->
-        <view wx:if="{{item.selected}}" class="control-points">
-          <view class="control-point resize-point" data-type="resize" data-index="{{index}}"></view>
-          <view class="control-point rotate-point" data-type="rotate" data-index="{{index}}"></view>
-          <view class="control-point delete-point" data-type="delete" data-index="{{index}}" bindtap="deletePhotoItem">×</view>
+        <!-- 格子中的图片 -->
+        <view wx:if="{{item.photoSrc}}" class="cell-photo {{draggingCell === index ? 'dragging' : ''}}">
+          <image 
+            src="{{item.photoSrc}}" 
+            mode="aspectFill"
+            class="photo-image"
+          ></image>
+          
+          <!-- 拖拽指示器 -->
+          <view wx:if="{{draggingCell === index}}" class="drag-indicator">
+            <text class="drag-text">拖拽到其他格子</text>
+          </view>
         </view>
+        
+        <!-- 空格子提示 -->
+        <view wx:else class="empty-cell">
+          <text class="empty-text">+</text>
+        </view>
+        
+        <!-- 格子编号（调试用） -->
+        <view class="cell-number">{{index + 1}}</view>
       </view>
     </view>
   </view>

@@ -5,9 +5,12 @@ Page({
   data: {
     canvasWidth: 300,
     canvasHeight: 400,
-    photoItems: [],
+    gridCells: [],
+    currentTemplate: null,
     remainingPhotos: [],
-    selectedItemIndex: -1,
+    draggingCell: -1,
+    dragOverCell: -1,
+    touchStartTime: 0,
     
     // 滤镜相关
     showFilterModal: false,
@@ -42,8 +45,8 @@ Page({
   onLoad() {
     // 获取系统信息
     const systemInfo = wx.getSystemInfoSync()
-    const canvasWidth = Math.min(systemInfo.windowWidth - 60, 300)
-    const canvasHeight = Math.floor(canvasWidth * 4 / 3)
+    const canvasWidth = systemInfo.windowWidth - 60
+    const canvasHeight = canvasWidth
     
     this.setData({
       canvasWidth,
@@ -79,67 +82,49 @@ Page({
       return
     }
     
-    // 根据模板自动布局照片
-    this.autoLayoutPhotos(selectedPhotos, template)
+    // 初始化九宫格数据
+    this.initGridLayout(selectedPhotos, template)
   },
 
-  // 自动布局照片
-  autoLayoutPhotos(photos, template) {
-    const photoItems = []
-    const remainingPhotos = [...photos]
+  // 初始化九宫格布局
+  initGridLayout(photos, template) {
+    const gridCells = []
     
-    if (template && template.cells) {
-      // 根据模板布局
-      const cellCount = Math.min(template.cells.length, photos.length)
+    // 设置当前模板
+    this.setData({
+      currentTemplate: template || { gridClass: 'grid-3x3', cells: [] }
+    })
+    
+    // 创建九宫格格子
+    const cellCount = template && template.cells ? template.cells.length : 9
+    
+    for (let i = 0; i < cellCount; i++) {
+      const cell = template && template.cells ? template.cells[i] : {}
+      const photo = photos[i] || null
       
-      for (let i = 0; i < cellCount; i++) {
-        const cell = template.cells[i]
-        const photo = photos[i]
-        
-        // 解析模板样式
-        const width = this.parseStyleValue(cell.style, 'width', this.data.canvasWidth)
-        const height = this.parseStyleValue(cell.style, 'height', this.data.canvasHeight)
-        
-        photoItems.push({
-          id: `photo_${i}`,
-          src: photo,
-          x: (this.data.canvasWidth - width) / 2 + i * 10, // 简单偏移避免重叠
-          y: (this.data.canvasHeight - height) / 2 + i * 10,
-          width: width,
-          height: height,
-          rotation: 0,
-          selected: false,
-          zIndex: i
-        })
-        
-        remainingPhotos.shift()
-      }
-    } else {
-      // 默认布局
-      photos.forEach((photo, index) => {
-        const size = Math.min(this.data.canvasWidth, this.data.canvasHeight) / 3
-        photoItems.push({
-          id: `photo_${index}`,
-          src: photo,
-          x: 50 + (index % 3) * (size + 10),
-          y: 50 + Math.floor(index / 3) * (size + 10),
-          width: size,
-          height: size,
-          rotation: 0,
-          selected: false,
-          zIndex: index
-        })
+      gridCells.push({
+        index: i,
+        class: cell.class || '',
+        photoSrc: photo
       })
     }
     
+    // 计算剩余照片
+    const remainingPhotos = photos.slice(cellCount)
+    
     this.setData({
-      photoItems,
+      gridCells,
       remainingPhotos
     })
+    
+    console.log('初始化九宫格:', { gridCells, remainingPhotos, template })
   },
 
-  // 解析样式值
+  // 解析样式值（已废弃，保留以防其他地方调用）
   parseStyleValue(style, property, baseValue) {
+    if (!style || typeof style !== 'string') {
+      return baseValue / 4 // 默认值
+    }
     const regex = new RegExp(`${property}:\\s*(\\d+)%`)
     const match = style.match(regex)
     if (match) {
@@ -149,117 +134,178 @@ Page({
   },
 
   // 照片触摸开始
-  onPhotoTouchStart(e) {
-    const index = e.currentTarget.dataset.index
+  // 格子触摸开始
+  onCellTouchStart(e) {
+    const cellIndex = e.currentTarget.dataset.cellIndex
+    const cell = this.data.gridCells[cellIndex]
+    
+    // 只有有图片的格子才能拖拽
+    if (!cell.photoSrc) return
+    
+    this.setData({
+      draggingCell: cellIndex,
+      touchStartTime: Date.now()
+    })
+  },
+
+  // 格子触摸移动
+  onCellTouchMove(e) {
+    if (this.data.draggingCell === -1) return
+    
+    // 检测拖拽到哪个格子上
     const touch = e.touches[0]
+    const element = wx.createSelectorQuery().in(this)
     
-    // 选中当前照片
-    this.selectPhoto(index)
-    
-    this.setData({
-      touchStartX: touch.clientX,
-      touchStartY: touch.clientY,
-      isDragging: true
-    })
+    // 简化处理：通过坐标计算目标格子
+    this.detectDragOverCell(touch.clientX, touch.clientY)
   },
 
-  // 照片触摸移动
-  onPhotoTouchMove(e) {
-    if (!this.data.isDragging || this.data.selectedItemIndex === -1) return
+  // 格子触摸结束
+  onCellTouchEnd(e) {
+    const dragOverCell = this.data.dragOverCell
+    const draggingCell = this.data.draggingCell
     
-    const touch = e.touches[0]
-    const deltaX = touch.clientX - this.data.touchStartX
-    const deltaY = touch.clientY - this.data.touchStartY
-    
-    const photoItems = [...this.data.photoItems]
-    const item = photoItems[this.data.selectedItemIndex]
-    
-    item.x += deltaX
-    item.y += deltaY
-    
-    this.setData({
-      photoItems,
-      touchStartX: touch.clientX,
-      touchStartY: touch.clientY
-    })
-  },
-
-  // 照片触摸结束
-  onPhotoTouchEnd() {
-    this.setData({
-      isDragging: false
-    })
-  },
-
-  // 选中照片
-  selectPhoto(index) {
-    const photoItems = [...this.data.photoItems]
-    
-    // 取消所有选中状态
-    photoItems.forEach(item => item.selected = false)
-    
-    // 选中当前照片
-    if (index >= 0 && index < photoItems.length) {
-      photoItems[index].selected = true
+    if (draggingCell !== -1 && dragOverCell !== -1 && dragOverCell !== draggingCell) {
+      // 交换两个格子的图片
+      this.swapCellPhotos(draggingCell, dragOverCell)
     }
     
     this.setData({
-      photoItems,
-      selectedItemIndex: index
+      draggingCell: -1,
+      dragOverCell: -1
     })
+  },
+
+  // 格子点击事件
+  onCellTap(e) {
+    const cellIndex = e.currentTarget.dataset.cellIndex
+    const touchEndTime = Date.now()
+    
+    // 如果是快速点击（不是拖拽），则选择照片
+    if (touchEndTime - this.data.touchStartTime < 200) {
+      this.selectCellPhoto(cellIndex)
+    }
+  },
+
+  // 选中照片
+  // 检测拖拽悬停的格子
+  detectDragOverCell(clientX, clientY) {
+    // 简化实现：根据触摸位置计算目标格子
+    // 实际项目中可以使用更精确的元素位置检测
+    const query = wx.createSelectorQuery().in(this)
+    query.selectAll('.grid-cell').boundingClientRect((rects) => {
+      let targetCell = -1
+      
+      rects.forEach((rect, index) => {
+        if (clientX >= rect.left && clientX <= rect.right &&
+            clientY >= rect.top && clientY <= rect.bottom) {
+          targetCell = index
+        }
+      })
+      
+      this.setData({
+        dragOverCell: targetCell
+      })
+    }).exec()
+  },
+
+  // 交换两个格子的图片
+  swapCellPhotos(fromIndex, toIndex) {
+    const gridCells = [...this.data.gridCells]
+    const fromPhoto = gridCells[fromIndex].photoSrc
+    const toPhoto = gridCells[toIndex].photoSrc
+    
+    // 交换图片
+    gridCells[fromIndex].photoSrc = toPhoto
+    gridCells[toIndex].photoSrc = fromPhoto
+    
+    this.setData({
+      gridCells
+    })
+    
+    wx.showToast({
+      title: '图片已交换',
+      icon: 'success',
+      duration: 1000
+    })
+  },
+
+  // 选择格子照片
+  selectCellPhoto(cellIndex) {
+    const cell = this.data.gridCells[cellIndex]
+    
+    if (cell.photoSrc) {
+      wx.showToast({
+        title: `选中第${cellIndex + 1}个格子`,
+        icon: 'none',
+        duration: 1000
+      })
+    } else {
+      // 空格子，可以添加照片
+      this.addPhotoToCell(cellIndex)
+    }
+  },
+
+  // 向格子添加照片
+  addPhotoToCell(cellIndex) {
+    const remainingPhotos = this.data.remainingPhotos
+    
+    if (remainingPhotos.length > 0) {
+      const gridCells = [...this.data.gridCells]
+      const newRemainingPhotos = [...remainingPhotos]
+      
+      gridCells[cellIndex].photoSrc = newRemainingPhotos.shift()
+      
+      this.setData({
+        gridCells,
+        remainingPhotos: newRemainingPhotos
+      })
+    } else {
+      wx.showToast({
+        title: '没有更多照片',
+        icon: 'none'
+      })
+    }
   },
 
   // 添加照片到画布
   addPhotoToCanvas(e) {
     const src = e.currentTarget.dataset.src
-    const photoItems = [...this.data.photoItems]
-    const remainingPhotos = [...this.data.remainingPhotos]
     
-    // 从剩余照片中移除
-    const index = remainingPhotos.indexOf(src)
-    if (index > -1) {
-      remainingPhotos.splice(index, 1)
+    // 找到第一个空的格子
+    const gridCells = [...this.data.gridCells]
+    const emptyIndex = gridCells.findIndex(cell => !cell.photoSrc)
+    
+    if (emptyIndex !== -1) {
+      // 添加到空格子
+      this.addPhotoToCell(emptyIndex)
+    } else {
+      wx.showToast({
+        title: '所有格子都已填满',
+        icon: 'none'
+      })
     }
-    
-    // 添加到画布
-    const newItem = {
-      id: `photo_${Date.now()}`,
-      src: src,
-      x: this.data.canvasWidth / 2 - 50,
-      y: this.data.canvasHeight / 2 - 50,
-      width: 100,
-      height: 100,
-      rotation: 0,
-      selected: true,
-      zIndex: photoItems.length
-    }
-    
-    // 取消其他选中状态
-    photoItems.forEach(item => item.selected = false)
-    photoItems.push(newItem)
-    
-    this.setData({
-      photoItems,
-      remainingPhotos,
-      selectedItemIndex: photoItems.length - 1
-    })
   },
 
   // 删除照片项
-  deletePhotoItem(e) {
-    const index = e.currentTarget.dataset.index
-    const photoItems = [...this.data.photoItems]
+  deletePhotoFromCell(cellIndex) {
+    const gridCells = [...this.data.gridCells]
     const remainingPhotos = [...this.data.remainingPhotos]
     
-    if (index >= 0 && index < photoItems.length) {
-      const item = photoItems[index]
-      remainingPhotos.push(item.src)
-      photoItems.splice(index, 1)
+    if (cellIndex >= 0 && cellIndex < gridCells.length && gridCells[cellIndex].photoSrc) {
+      const deletedPhoto = gridCells[cellIndex].photoSrc
+      remainingPhotos.push(deletedPhoto)
+      gridCells[cellIndex].photoSrc = null
       
       this.setData({
-        photoItems,
-        remainingPhotos,
-        selectedItemIndex: -1
+        gridCells,
+        remainingPhotos
+      })
+      
+      wx.showToast({
+        title: '照片已移除',
+        icon: 'success',
+        duration: 1000
       })
     }
   },
