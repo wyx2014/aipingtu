@@ -42,7 +42,7 @@ Page({
     isRotating: false
   },
 
-  onLoad() {
+  async onLoad() {
     // 获取系统信息
     const systemInfo = wx.getSystemInfoSync()
     const canvasWidth = systemInfo.windowWidth - 60
@@ -54,19 +54,42 @@ Page({
     })
     
     // 初始化画布和照片
-    this.initCanvas()
+    await this.initCanvas()
     this.loadPhotos()
   },
 
   // 初始化画布
-  initCanvas() {
-    const ctx = wx.createCanvasContext('puzzleCanvas', this)
+  async initCanvas() {
+    const query = wx.createSelectorQuery().in(this)
+    const canvas = await new Promise((resolve) => {
+      query.select('#puzzleCanvas')
+        .fields({ node: true, size: true })
+        .exec((res) => {
+          resolve(res[0])
+        })
+    })
+    
+    const canvasNode = canvas.node
+    const ctx = canvasNode.getContext('2d')
+    
+    // 设置canvas实际尺寸（提高清晰度）- 使用更高的分辨率倍数
+    const dpr = wx.getSystemInfoSync().pixelRatio
+    const scaleFactor = Math.max(dpr, 2) * 2 // 进一步提高分辨率
+    canvasNode.width = this.data.canvasWidth * scaleFactor
+    canvasNode.height = this.data.canvasHeight * scaleFactor
+    ctx.scale(scaleFactor, scaleFactor)
+    
+    // 设置高质量渲染选项
+    ctx.imageSmoothingEnabled = true
+    ctx.imageSmoothingQuality = 'high'
+    
+    this.canvasNode = canvasNode
     this.canvasContext = ctx
+    this.scaleFactor = scaleFactor
     
     // 设置画布背景
-    ctx.setFillStyle('#ffffff')
+    ctx.fillStyle = '#ffffff'
     ctx.fillRect(0, 0, this.data.canvasWidth, this.data.canvasHeight)
-    ctx.draw()
   },
 
   // 加载照片
@@ -441,16 +464,27 @@ Page({
   },
 
   // 保存拼图
-  savePuzzle() {
+  async savePuzzle() {
     this.setData({
       isLoading: true,
       loadingText: '正在保存...'
     })
     
-    // 绘制最终图片
-    this.drawFinalImage().then(() => {
+    try {
+      // 绘制最终图片
+      await this.drawFinalImage()
+      
+      // 导出图片 - 使用最高质量设置
       wx.canvasToTempFilePath({
-        canvasId: 'puzzleCanvas',
+        canvas: this.canvasNode,
+        x: 0,
+        y: 0,
+        width: this.data.canvasWidth,
+        height: this.data.canvasHeight,
+        destWidth: this.data.canvasWidth * this.scaleFactor,
+        destHeight: this.data.canvasHeight * this.scaleFactor,
+        quality: 1.0, // 最高质量
+        fileType: 'png', // 使用PNG格式保持最佳质量
         success: (res) => {
           wx.saveImageToPhotosAlbum({
             filePath: res.tempFilePath,
@@ -473,7 +507,8 @@ Page({
             }
           })
         },
-        fail: () => {
+        fail: (err) => {
+          console.error('生成图片失败:', err)
           this.setData({
             isLoading: false
           })
@@ -483,16 +518,25 @@ Page({
           })
         }
       }, this)
-    })
+    } catch (error) {
+      console.error('绘制图片失败:', error)
+      this.setData({
+        isLoading: false
+      })
+      wx.showToast({
+        title: '绘制图片失败',
+        icon: 'none'
+      })
+    }
   },
 
   // 绘制最终图片
   drawFinalImage() {
-    return new Promise((resolve) => {
+    return new Promise(async (resolve) => {
       const ctx = this.canvasContext
       
       // 清空画布
-      ctx.setFillStyle('#ffffff')
+      ctx.fillStyle = '#ffffff'
       ctx.fillRect(0, 0, this.data.canvasWidth, this.data.canvasHeight)
       
       // 绘制九宫格中的图片
@@ -500,31 +544,75 @@ Page({
       const cellsWithPhotos = gridCells.filter(cell => cell.photoSrc)
       
       if (cellsWithPhotos.length === 0) {
-        ctx.draw(false, resolve)
+        resolve()
         return
       }
-      
-      let loadedCount = 0
-      const totalCount = cellsWithPhotos.length
       
       // 计算每个格子的位置和大小
       const cellWidth = this.data.canvasWidth / 3
       const cellHeight = this.data.canvasHeight / 3
       
-      cellsWithPhotos.forEach((cell) => {
-        const row = Math.floor(cell.index / 3)
-        const col = cell.index % 3
-        const x = col * cellWidth
-        const y = row * cellHeight
-        
-        // 绘制图片
-        ctx.drawImage(cell.photoSrc, x, y, cellWidth, cellHeight)
-        
-        loadedCount++
-        if (loadedCount === totalCount) {
-          ctx.draw(false, resolve)
-        }
+      // 加载并绘制所有图片
+      const imagePromises = cellsWithPhotos.map((cell) => {
+        return new Promise((imageResolve) => {
+          const img = this.canvasNode.createImage()
+          img.onload = () => {
+            const row = Math.floor(cell.index / 3)
+            const col = cell.index % 3
+            const x = col * cellWidth
+            const y = row * cellHeight
+            
+            // 保存当前状态
+            ctx.save()
+            
+            // 设置高质量绘制选项
+            ctx.imageSmoothingEnabled = true
+            ctx.imageSmoothingQuality = 'high'
+            
+            // 计算图片的宽高比和最佳绘制尺寸
+            const imgAspectRatio = img.width / img.height
+            const cellAspectRatio = cellWidth / cellHeight
+            
+            let drawWidth, drawHeight, drawX, drawY
+            
+            if (imgAspectRatio > cellAspectRatio) {
+              // 图片更宽，以高度为准
+              drawHeight = cellHeight
+              drawWidth = drawHeight * imgAspectRatio
+              drawX = x - (drawWidth - cellWidth) / 2
+              drawY = y
+            } else {
+              // 图片更高，以宽度为准
+              drawWidth = cellWidth
+              drawHeight = drawWidth / imgAspectRatio
+              drawX = x
+              drawY = y - (drawHeight - cellHeight) / 2
+            }
+            
+            // 设置裁剪区域确保图片不超出格子边界
+            ctx.beginPath()
+            ctx.rect(x, y, cellWidth, cellHeight)
+            ctx.clip()
+            
+            // 使用高质量算法绘制图片
+            ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight)
+            
+            // 恢复状态
+            ctx.restore()
+            
+            imageResolve()
+          }
+          img.onerror = () => {
+            console.error('图片加载失败:', cell.photoSrc)
+            imageResolve()
+          }
+          img.src = cell.photoSrc
+        })
       })
+      
+      // 等待所有图片加载完成
+      await Promise.all(imagePromises)
+      resolve()
     })
   },
 

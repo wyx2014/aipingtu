@@ -150,7 +150,8 @@
 
   <!-- 隐藏的canvas用于生成图片 -->
   <canvas 
-    canvas-id="puzzleCanvas" 
+    type="2d" 
+    id="puzzleCanvas" 
     style="position: absolute; left: -9999px; top: -9999px; width: {{canvasWidth}}px; height: {{canvasHeight}}px;"
   ></canvas>
 
