@@ -9,55 +9,60 @@ Page({
       {
         name: '经典九宫格',
         style: 'background: #fff;',
+        gridClass: 'grid-3x3',
         cells: [
-          { style: 'width: 30%; height: 30%; margin: 1.5%;' },
-          { style: 'width: 30%; height: 30%; margin: 1.5%;' },
-          { style: 'width: 30%; height: 30%; margin: 1.5%;' },
-          { style: 'width: 30%; height: 30%; margin: 1.5%;' },
-          { style: 'width: 30%; height: 30%; margin: 1.5%;' },
-          { style: 'width: 30%; height: 30%; margin: 1.5%;' },
-          { style: 'width: 30%; height: 30%; margin: 1.5%;' },
-          { style: 'width: 30%; height: 30%; margin: 1.5%;' },
-          { style: 'width: 30%; height: 30%; margin: 1.5%;' }
+          { class: '' },
+          { class: '' },
+          { class: '' },
+          { class: '' },
+          { class: '' },
+          { class: '' },
+          { class: '' },
+          { class: '' },
+          { class: '' }
         ]
       },
       {
         name: '大图配小图',
         style: 'background: #fff;',
+        gridClass: 'grid-mixed',
         cells: [
-          { style: 'width: 60%; height: 60%; margin: 2%;' },
-          { style: 'width: 30%; height: 28%; margin: 2%;' },
-          { style: 'width: 30%; height: 28%; margin: 2%;' },
-          { style: 'width: 30%; height: 28%; margin: 2%;' },
-          { style: 'width: 30%; height: 28%; margin: 2%;' }
+          { class: 'big' },
+          { class: '' },
+          { class: '' },
+          { class: '' },
+          { class: '' }
         ]
       },
       {
         name: '横向拼接',
         style: 'background: #fff;',
+        gridClass: 'grid-horizontal',
         cells: [
-          { style: 'width: 48%; height: 100%; margin: 1%;' },
-          { style: 'width: 48%; height: 100%; margin: 1%;' }
+          { class: '' },
+          { class: '' }
         ]
       },
       {
         name: '竖向拼接',
         style: 'background: #fff;',
+        gridClass: 'grid-vertical',
         cells: [
-          { style: 'width: 100%; height: 48%; margin: 1% 0;' },
-          { style: 'width: 100%; height: 48%; margin: 1% 0;' }
+          { class: '' },
+          { class: '' }
         ]
       },
       {
         name: '创意布局',
         style: 'background: #fff;',
+        gridClass: 'grid-creative',
         cells: [
-          { style: 'width: 40%; height: 40%; margin: 2%;' },
-          { style: 'width: 50%; height: 25%; margin: 2%;' },
-          { style: 'width: 50%; height: 25%; margin: 2%;' },
-          { style: 'width: 30%; height: 25%; margin: 2%;' },
-          { style: 'width: 30%; height: 25%; margin: 2%;' },
-          { style: 'width: 30%; height: 25%; margin: 2%;' }
+          { class: 'big' },
+          { class: '' },
+          { class: '' },
+          { class: '' },
+          { class: '' },
+          { class: '' }
         ]
       }
     ]

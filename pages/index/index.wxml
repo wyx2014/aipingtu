@@ -41,8 +41,8 @@
               bindtap="selectTemplate"
               data-index="{{index}}">
           <view class="template-preview" style="{{item.style}}">
-            <view class="template-grid">
-              <view class="grid-cell" wx:for="{{item.cells}}" wx:for-item="cell" wx:key="cellIndex" style="{{cell.style}}"></view>
+            <view class="template-grid {{item.gridClass}}">
+              <view class="grid-cell {{cell.class}}" wx:for="{{item.cells}}" wx:for-item="cell" wx:key="cellIndex"></view>
             </view>
           </view>
           <text class="template-name">{{item.name}}</text>

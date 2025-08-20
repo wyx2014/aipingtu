@@ -136,7 +136,7 @@
 }
 
 .template-preview {
-  width: 160rpx;
+  width: 200rpx;
   height: 200rpx;
   background: white;
   border-radius: 16rpx;
@@ -149,16 +149,59 @@
 .template-grid {
   width: 100%;
   height: 100%;
-  display: flex;
-  flex-wrap: wrap;
   padding: 8rpx;
   box-sizing: border-box;
+}
+
+.template-grid.grid-3x3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  gap: 4rpx;
+}
+
+.template-grid.grid-mixed {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: 2fr 1fr 1fr;
+  gap: 4rpx;
+}
+
+.template-grid.grid-horizontal {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr;
+  gap: 4rpx;
+}
+
+.template-grid.grid-vertical {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 4rpx;
+}
+
+.template-grid.grid-creative {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-rows: 2fr 1fr 1fr;
+  gap: 4rpx;
 }
 
 .grid-cell {
   background: #f8f9fa;
   border: 1rpx solid #dee2e6;
   border-radius: 4rpx;
+}
+
+.grid-cell.large {
+  grid-row: span 2;
+  grid-column: span 1;
+}
+
+.grid-cell.big {
+  grid-row: span 2;
+  grid-column: span 2;
 }
 
 .template-name {
