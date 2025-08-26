@@ -128,12 +128,18 @@ Page({
   initGridLayout(photos, template) {
     const gridCells = []
     
+    // 根据模版设置网格类名
+    let gridClass = 'grid-3x3' // 默认九宫格
+    if (template && template.gridClass) {
+      gridClass = template.gridClass
+    }
+    
     // 设置当前模板
     this.setData({
-      currentTemplate: template || { gridClass: 'grid-3x3', cells: [] }
+      currentTemplate: { ...template, gridClass } || { gridClass: 'grid-3x3', cells: [] }
     })
     
-    // 创建九宫格格子
+    // 创建格子
     const cellCount = template && template.cells ? template.cells.length : 9
     
     for (let i = 0; i < cellCount; i++) {
@@ -156,7 +162,7 @@ Page({
       remainingPhotos
     })
     
-    console.log('初始化九宫格:', { gridCells, remainingPhotos, template })
+    console.log('初始化布局:', { gridCells, remainingPhotos, template, gridClass })
   },
 
   // 解析样式值（已废弃，保留以防其他地方调用）
@@ -777,80 +783,277 @@ Page({
       ctx.fillStyle = '#ffffff'
       ctx.fillRect(0, 0, this.data.canvasWidth, this.data.canvasHeight)
       
-      // 绘制九宫格中的图片
+      // 获取当前模版和格子数据
       const gridCells = this.data.gridCells || []
       const cellsWithPhotos = gridCells.filter(cell => cell.photoSrc)
+      const currentTemplate = this.data.currentTemplate
       
-      if (cellsWithPhotos.length === 0) {
+      if (cellsWithPhotos.length === 0 || !currentTemplate) {
         resolve()
         return
       }
       
-      // 计算每个格子的位置和大小
-      const cellWidth = this.data.canvasWidth / 3
-      const cellHeight = this.data.canvasHeight / 3
-      
-      // 加载并绘制所有图片
-      const imagePromises = cellsWithPhotos.map((cell) => {
-        return new Promise((imageResolve) => {
-          const img = this.canvasNode.createImage()
-          img.onload = () => {
-            const row = Math.floor(cell.index / 3)
-            const col = cell.index % 3
-            const x = col * cellWidth
-            const y = row * cellHeight
-            
-            // 保存当前状态
-            ctx.save()
-            
-            // 设置高质量绘制选项
-            ctx.imageSmoothingEnabled = true
-            ctx.imageSmoothingQuality = 'high'
-            
-            // 计算图片的宽高比和最佳绘制尺寸
-            const imgAspectRatio = img.width / img.height
-            const cellAspectRatio = cellWidth / cellHeight
-            
-            let drawWidth, drawHeight, drawX, drawY
-            
-            if (imgAspectRatio > cellAspectRatio) {
-              // 图片更宽，以高度为准
-              drawHeight = cellHeight
-              drawWidth = drawHeight * imgAspectRatio
-              drawX = x - (drawWidth - cellWidth) / 2
-              drawY = y
-            } else {
-              // 图片更高，以宽度为准
-              drawWidth = cellWidth
-              drawHeight = drawWidth / imgAspectRatio
-              drawX = x
-              drawY = y - (drawHeight - cellHeight) / 2
-            }
-            
-            // 设置裁剪区域确保图片不超出格子边界
-            ctx.beginPath()
-            ctx.rect(x, y, cellWidth, cellHeight)
-            ctx.clip()
-            
-            // 使用高质量算法绘制图片
-            ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight)
-            
-            // 恢复状态
-            ctx.restore()
-            
-            imageResolve()
-          }
-          img.onerror = () => {
-            console.error('图片加载失败:', cell.photoSrc)
-            imageResolve()
-          }
-          img.src = cell.photoSrc
-        })
-      })
-      
-      // 等待所有图片加载完成
-      await Promise.all(imagePromises)
+      // 根据模版类型绘制不同布局
+      await this.drawTemplateLayout(ctx, cellsWithPhotos, currentTemplate)
       resolve()
+    })
+  },
+
+  // 根据模版类型绘制布局
+  async drawTemplateLayout(ctx, cellsWithPhotos, template) {
+    const canvasWidth = this.data.canvasWidth
+    const canvasHeight = this.data.canvasHeight
+    
+    switch (template.gridClass) {
+      case 'grid-3x3':
+        await this.drawGrid3x3(ctx, cellsWithPhotos, canvasWidth, canvasHeight)
+        break
+      case 'grid-big-small':
+        await this.drawGridBigSmall(ctx, cellsWithPhotos, canvasWidth, canvasHeight)
+        break
+      case 'grid-horizontal':
+        await this.drawGridHorizontal(ctx, cellsWithPhotos, canvasWidth, canvasHeight)
+        break
+      case 'grid-vertical':
+        await this.drawGridVertical(ctx, cellsWithPhotos, canvasWidth, canvasHeight)
+        break
+      case 'grid-creative':
+        await this.drawGridCreative(ctx, cellsWithPhotos, canvasWidth, canvasHeight)
+        break
+      default:
+        console.warn('未知的模版类型:', template.gridClass)
+        break
+    }
+  },
+
+  // 绘制九宫格布局
+  // 绘制九宫格布局 - 匹配CSS grid布局: 1fr 1fr 1fr (列) x 1fr 1fr 1fr (行)
+  async drawGrid3x3(ctx, cellsWithPhotos, canvasWidth, canvasHeight) {
+    const gap = 8 // 对应CSS中的gap: 8rpx，转换为像素
+    const cellWidth = (canvasWidth - gap * 2) / 3
+    const cellHeight = (canvasHeight - gap * 2) / 3
+    
+    const imagePromises = cellsWithPhotos.map((cell) => {
+      const col = cell.index % 3
+      const row = Math.floor(cell.index / 3)
+      return this.drawImageInCell(ctx, cell, {
+        x: col * (cellWidth + gap),
+        y: row * (cellHeight + gap),
+        width: cellWidth,
+        height: cellHeight
+      })
+    })
+    
+    await Promise.all(imagePromises)
+  },
+
+  // 绘制大图配小图布局
+  // 绘制大图配小图布局 - 匹配CSS grid布局: 2fr 1fr (列) x 2fr 1fr 1fr (行)
+  async drawGridBigSmall(ctx, cellsWithPhotos, canvasWidth, canvasHeight) {
+    // 计算grid布局的尺寸：2fr + 1fr = 3fr总计(列)，2fr + 1fr + 1fr = 4fr总计(行)
+    const colUnit = canvasWidth / 3   // 每个fr单位的宽度
+    const rowUnit = canvasHeight / 4  // 每个fr单位的高度
+    const gap = 8 // 对应CSS中的gap: 8rpx，转换为像素
+    
+    const imagePromises = cellsWithPhotos.map((cell, index) => {
+      let cellRect
+      if (index === 0) {
+        // 大图：占据2x2的grid区域 (grid-column: 1, grid-row: 1/3)
+        cellRect = {
+          x: 0,
+          y: 0,
+          width: colUnit * 2 - gap/2,
+          height: rowUnit * 2 - gap/2
+        }
+      } else if (index === 1) {
+        // 小图1：第2列第1行 (grid-column: 2, grid-row: 1)
+        cellRect = {
+          x: colUnit * 2 + gap/2,
+          y: 0,
+          width: colUnit - gap/2,
+          height: rowUnit - gap/2
+        }
+      } else if (index === 2) {
+        // 小图2：第2列第2行 (grid-column: 2, grid-row: 2)
+        cellRect = {
+          x: colUnit * 2 + gap/2,
+          y: rowUnit + gap/2,
+          width: colUnit - gap/2,
+          height: rowUnit - gap/2
+        }
+      } else if (index === 3) {
+        // 小图3：第1列第3行 (grid-column: 1, grid-row: 3)
+        cellRect = {
+          x: 0,
+          y: rowUnit * 2 + gap/2,
+          width: colUnit - gap/2,
+          height: rowUnit - gap/2
+        }
+      } else if (index === 4) {
+        // 小图4：第2列第3行 (grid-column: 2, grid-row: 3)
+        cellRect = {
+          x: colUnit * 2 + gap/2,
+          y: rowUnit * 2 + gap/2,
+          width: colUnit - gap/2,
+          height: rowUnit - gap/2
+        }
+      }
+      
+      return this.drawImageInCell(ctx, cell, cellRect)
+    })
+    
+    await Promise.all(imagePromises)
+  },
+
+  // 绘制横向拼接布局 - 匹配CSS grid布局: 1fr 1fr (列) x 1fr (行)
+  async drawGridHorizontal(ctx, cellsWithPhotos, canvasWidth, canvasHeight) {
+    const gap = 8 // 对应CSS中的gap: 8rpx，转换为像素
+    const cellWidth = (canvasWidth - gap) / 2
+    
+    const imagePromises = cellsWithPhotos.map((cell, index) => {
+      return this.drawImageInCell(ctx, cell, {
+        x: index * (cellWidth + gap),
+        y: 0,
+        width: cellWidth,
+        height: canvasHeight
+      })
+    })
+    
+    await Promise.all(imagePromises)
+  },
+
+  // 绘制竖向拼接布局 - 匹配CSS grid布局: 1fr (列) x 1fr 1fr (行)
+  async drawGridVertical(ctx, cellsWithPhotos, canvasWidth, canvasHeight) {
+    const gap = 8 // 对应CSS中的gap: 8rpx，转换为像素
+    const cellHeight = (canvasHeight - gap) / 2
+    
+    const imagePromises = cellsWithPhotos.map((cell, index) => {
+      return this.drawImageInCell(ctx, cell, {
+        x: 0,
+        y: index * (cellHeight + gap),
+        width: canvasWidth,
+        height: cellHeight
+      })
+    })
+    
+    await Promise.all(imagePromises)
+  },
+
+  // 绘制创意布局 - 匹配CSS grid布局: 2fr 1fr 1fr (列) x 2fr 1fr 1fr (行)
+  async drawGridCreative(ctx, cellsWithPhotos, canvasWidth, canvasHeight) {
+    // 计算grid布局的尺寸：2fr + 1fr + 1fr = 4fr总计
+    const colUnit = canvasWidth / 4  // 每个fr单位的宽度
+    const rowUnit = canvasHeight / 4 // 每个fr单位的高度
+    const gap = 8 // 对应CSS中的gap: 8rpx，转换为像素
+    
+    const imagePromises = cellsWithPhotos.map((cell, index) => {
+      let cellRect
+      if (index === 0) {
+        // 大图：占据2x2的grid区域 (grid-column: 1/3, grid-row: 1/3)
+        cellRect = {
+          x: 0,
+          y: 0,
+          width: colUnit * 2 - gap/2,
+          height: rowUnit * 2 - gap/2
+        }
+      } else if (index === 1) {
+        // 小图1：第3列第1行 (grid-column: 3, grid-row: 1)
+        cellRect = {
+          x: colUnit * 3 + gap/2,
+          y: 0,
+          width: colUnit - gap/2,
+          height: rowUnit - gap/2
+        }
+      } else if (index === 2) {
+        // 小图2：第3列第2行 (grid-column: 3, grid-row: 2)
+        cellRect = {
+          x: colUnit * 3 + gap/2,
+          y: rowUnit + gap/2,
+          width: colUnit - gap/2,
+          height: rowUnit - gap/2
+        }
+      } else if (index === 3) {
+        // 小图3：第1列第3行 (grid-column: 1, grid-row: 3)
+        cellRect = {
+          x: 0,
+          y: rowUnit * 2 + gap/2,
+          width: colUnit - gap/2,
+          height: rowUnit - gap/2
+        }
+      } else if (index === 4) {
+        // 小图4：第2列第3行 (grid-column: 2, grid-row: 3)
+        cellRect = {
+          x: colUnit + gap/2,
+          y: rowUnit * 2 + gap/2,
+          width: colUnit - gap/2,
+          height: rowUnit - gap/2
+        }
+      } else if (index === 5) {
+        // 小图5：第3列第3行 (grid-column: 3, grid-row: 3)
+        cellRect = {
+          x: colUnit * 3 + gap/2,
+          y: rowUnit * 2 + gap/2,
+          width: colUnit - gap/2,
+          height: rowUnit - gap/2
+        }
+      }
+      
+      return this.drawImageInCell(ctx, cell, cellRect)
+    })
+    
+    await Promise.all(imagePromises)
+  },
+
+  // 在指定区域绘制图片
+  drawImageInCell(ctx, cell, cellRect) {
+    return new Promise((resolve) => {
+      const img = this.canvasNode.createImage()
+      img.onload = () => {
+        // 保存当前状态
+        ctx.save()
+        
+        // 设置高质量绘制选项
+        ctx.imageSmoothingEnabled = true
+        ctx.imageSmoothingQuality = 'high'
+        
+        // 计算图片的宽高比和最佳绘制尺寸
+        const imgAspectRatio = img.width / img.height
+        const cellAspectRatio = cellRect.width / cellRect.height
+        
+        let drawWidth, drawHeight, drawX, drawY
+        
+        if (imgAspectRatio > cellAspectRatio) {
+          // 图片更宽，以高度为准
+          drawHeight = cellRect.height
+          drawWidth = drawHeight * imgAspectRatio
+          drawX = cellRect.x - (drawWidth - cellRect.width) / 2
+          drawY = cellRect.y
+        } else {
+          // 图片更高，以宽度为准
+          drawWidth = cellRect.width
+          drawHeight = drawWidth / imgAspectRatio
+          drawX = cellRect.x
+          drawY = cellRect.y - (drawHeight - cellRect.height) / 2
+        }
+        
+        // 设置裁剪区域确保图片不超出格子边界
+        ctx.beginPath()
+        ctx.rect(cellRect.x, cellRect.y, cellRect.width, cellRect.height)
+        ctx.clip()
+        
+        // 使用高质量算法绘制图片
+        ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight)
+        
+        // 恢复状态
+        ctx.restore()
+        
+        resolve()
+      }
+      img.onerror = () => {
+        console.error('图片加载失败:', cell.photoSrc)
+        resolve()
+      }
+      img.src = cell.photoSrc
     })
   },
 

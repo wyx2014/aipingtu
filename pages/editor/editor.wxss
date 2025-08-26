@@ -74,6 +74,38 @@
   gap: 8rpx;
 }
 
+/* 大图配小图布局 */
+.grid-template.grid-mixed {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: 2fr 1fr 1fr;
+  gap: 8rpx;
+}
+
+/* 横向拼接布局 */
+.grid-template.grid-horizontal {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr;
+  gap: 8rpx;
+}
+
+/* 竖向拼接布局 */
+.grid-template.grid-vertical {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 8rpx;
+}
+
+/* 创意布局 */
+.grid-template.grid-creative {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-rows: 2fr 1fr 1fr;
+  gap: 8rpx;
+}
+
 /* 格子样式 */
 .grid-cell {
   position: relative;

@@ -153,157 +153,38 @@
   box-sizing: border-box;
 }
 
-/* 3张图片布局 */
-.template-grid.grid-3-classic {
+.template-grid.grid-3x3 {
   display: grid;
-  grid-template-columns: 2fr 1fr;
-  grid-template-rows: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
   gap: 4rpx;
 }
 
-.template-grid.grid-3-horizontal {
+.template-grid.grid-mixed {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: 2fr 1fr 1fr;
+  gap: 4rpx;
+}
+
+.template-grid.grid-horizontal {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr;
   gap: 4rpx;
 }
 
-.template-grid.grid-3-vertical {
+.template-grid.grid-vertical {
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: 1fr 1fr 1fr;
-  gap: 4rpx;
-}
-
-/* 4张图片布局 */
-.template-grid.grid-4-square {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
   gap: 4rpx;
 }
 
-.template-grid.grid-4-mixed {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  grid-template-rows: 2fr 1fr 1fr;
-  gap: 4rpx;
-}
-
-.template-grid.grid-4-horizontal {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  grid-template-rows: 1fr;
-  gap: 4rpx;
-}
-
-/* 5张图片布局 */
-.template-grid.grid-5-main {
+.template-grid.grid-creative {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr;
   grid-template-rows: 2fr 1fr 1fr;
-  gap: 4rpx;
-}
-
-.template-grid.grid-5-layered {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 2fr 1fr;
-  gap: 4rpx;
-}
-
-.template-grid.grid-5-creative {
-  display: grid;
-  grid-template-columns: 1fr 2fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  gap: 4rpx;
-}
-
-/* 6张图片布局 */
-.template-grid.grid-6-matrix {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  gap: 4rpx;
-}
-
-.template-grid.grid-6-mixed {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
-  grid-template-rows: 2fr 1fr 1fr;
-  gap: 4rpx;
-}
-
-.template-grid.grid-6-stripe {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr 1fr;
-  gap: 4rpx;
-}
-
-/* 7张图片布局 */
-.template-grid.grid-7-main {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
-  grid-template-rows: 2fr 1fr 1fr;
-  gap: 4rpx;
-}
-
-.template-grid.grid-7-grouped {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: 1fr 1fr 1fr;
-  gap: 4rpx;
-}
-
-.template-grid.grid-7-creative {
-  display: grid;
-  grid-template-columns: 1fr 2fr 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  gap: 4rpx;
-}
-
-/* 8张图片布局 */
-.template-grid.grid-8-matrix {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  gap: 4rpx;
-}
-
-.template-grid.grid-8-mixed {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
-  grid-template-rows: 2fr 1fr 1fr;
-  gap: 4rpx;
-}
-
-.template-grid.grid-8-creative {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: 1fr 2fr 1fr;
-  gap: 4rpx;
-}
-
-/* 9张图片布局 */
-.template-grid.grid-9-classic {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: 1fr 1fr 1fr;
-  gap: 4rpx;
-}
-
-.template-grid.grid-9-main {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
-  grid-template-rows: 2fr 1fr 1fr;
-  gap: 4rpx;
-}
-
-.template-grid.grid-9-creative {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: 1fr 2fr 1fr;
   gap: 4rpx;
 }
 
@@ -320,16 +201,6 @@
 
 .grid-cell.big {
   grid-row: span 2;
-  grid-column: span 2;
-}
-
-.grid-cell.tall {
-  grid-row: span 2;
-  grid-column: span 1;
-}
-
-.grid-cell.wide {
-  grid-row: span 1;
   grid-column: span 2;
 }
 
