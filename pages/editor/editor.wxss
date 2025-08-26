@@ -75,7 +75,7 @@
 }
 
 /* 大图配小图布局 */
-.grid-template.grid-mixed {
+.grid-template.grid-big-small {
   display: grid;
   grid-template-columns: 2fr 1fr;
   grid-template-rows: 2fr 1fr 1fr;
@@ -106,6 +106,88 @@
   gap: 8rpx;
 }
 
+/* 3张图片布局 */
+/* 横向三联 */
+.grid-template.grid-3-horizontal {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr;
+  gap: 8rpx;
+}
+
+/* 竖向三联 */
+.grid-template.grid-3-vertical {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  gap: 8rpx;
+}
+
+/* T型布局 */
+.grid-template.grid-3-T-shape {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 8rpx;
+}
+
+/* 倒L型布局 */
+.grid-template.grid-3-reverse-T-shape {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 8rpx;
+}
+
+/* 4张图片布局 */
+/* 田字格 */
+.grid-template.grid-4-square {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 8rpx;
+}
+
+/* 横向四联 */
+.grid-template.grid-4-horizontal {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr;
+  gap: 8rpx;
+}
+
+/* 竖向四联 */
+.grid-template.grid-4-vertical {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr;
+  gap: 8rpx;
+}
+
+/* T型布局 */
+.grid-template.grid-4-2t-shape {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 8rpx;
+}
+
+/* 左右分割 */
+.grid-template.grid-4-left-right {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: 3fr 1fr 1fr;
+  gap: 8rpx;
+}
+
+/* 上下分割 */
+.grid-template.grid-4-top-bottom {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 2fr 1fr;
+  gap: 8rpx;
+}
+
 /* 格子样式 */
 .grid-cell {
   position: relative;
@@ -123,13 +205,23 @@
   transform: scale(1.05);
 }
 
-.grid-cell.big {
+.grid-cell.wide2 {
+  grid-row: span 1;
   grid-column: span 2;
-  grid-row: span 2;
+}
+.grid-cell.wide3 {
+  grid-row: span 1;
+  grid-column: span 3;
 }
 
-.grid-cell.large {
+.grid-cell.high2 {
   grid-row: span 2;
+  grid-column: span 1;
+}
+
+.grid-cell.big2 {
+  grid-row: span 2;
+  grid-column: span 2;
 }
 
 /* 格子中的图片 */

@@ -10,6 +10,11 @@ Page({
         name: '经典九宫格',
         style: 'background: #fff;',
         gridClass: 'grid-3x3',
+        gridConfig: {
+          columns: [1, 1, 1], // 1fr 1fr 1fr
+          rows: [1, 1, 1],    // 1fr 1fr 1fr
+          gap: 8
+        },
         cells: [
           { class: '' },
           { class: '' },
@@ -25,19 +30,27 @@ Page({
       {
         name: '大图配小图',
         style: 'background: #fff;',
-        gridClass: 'grid-mixed',
+        gridClass: 'grid-big-small',
+        gridConfig: {
+          columns: [2, 1], // 2fr 1fr
+          rows: [2, 1, 1], // 2fr 1fr 1fr
+          gap: 8
+        },
         cells: [
-          { class: 'big' },
+          { class: 'big2' },
           { class: '' },
           { class: '' },
-          { class: '' },
-          { class: '' }
         ]
       },
       {
         name: '横向拼接',
         style: 'background: #fff;',
         gridClass: 'grid-horizontal',
+        gridConfig: {
+          columns: [1, 1], // 1fr 1fr
+          rows: [1],       // 1fr
+          gap: 8
+        },
         cells: [
           { class: '' },
           { class: '' }
@@ -47,6 +60,11 @@ Page({
         name: '竖向拼接',
         style: 'background: #fff;',
         gridClass: 'grid-vertical',
+        gridConfig: {
+          columns: [1],    // 1fr
+          rows: [1, 1],    // 1fr 1fr
+          gap: 8
+        },
         cells: [
           { class: '' },
           { class: '' }
@@ -56,15 +74,208 @@ Page({
         name: '创意布局',
         style: 'background: #fff;',
         gridClass: 'grid-creative',
+        gridConfig: {
+          columns: [2, 1, 1], // 2fr 1fr 1fr
+          rows: [2, 1, 1],    // 2fr 1fr 1fr
+          gap: 8
+        },
         cells: [
-          { class: 'big' },
+          { class: 'big2' },
           { class: '' },
           { class: '' },
           { class: '' },
           { class: '' },
           { class: '' }
         ]
-      }
+      },
+      // 3张图片布局模板
+      {
+        name: '横向三联',
+        style: 'background: #fff;',
+        gridClass: 'grid-3-horizontal',
+        gridConfig: {
+          columns: [1, 1, 1], // 1fr 1fr 1fr
+          rows: [1],          // 1fr
+          gap: 8
+        },
+        cells: [
+          { class: '' },
+          { class: '' },
+          { class: '' }
+        ]
+      },
+      {
+        name: '竖向三联',
+        style: 'background: #fff;',
+        gridClass: 'grid-3-vertical',
+        gridConfig: {
+          columns: [1],       // 1fr
+          rows: [1, 1, 1],    // 1fr 1fr 1fr
+          gap: 8
+        },
+        cells: [
+          { class: '' },
+          { class: '' },
+          { class: '' }
+        ]
+      },
+      {
+        name: 'T型布局',
+        style: 'background: #fff;',
+        gridClass: 'grid-3-T-shape',
+        gridConfig: {
+          columns: [1, 1], // 1fr 1fr
+          rows: [1, 1],    // 1fr 1fr
+          gap: 8
+        },
+        cells: [
+          { class: 'wide2' },
+          { class: '' },
+          { class: '' }
+        ]
+      },
+      {
+         name: '倒T型布局',
+         style: 'background: #fff;',
+         gridClass: 'grid-3-T-shape',
+         gridConfig: {
+           columns: [1, 1], // 1fr 1fr
+           rows: [1, 1],    // 1fr 1fr
+           gap: 8
+         },
+         cells: [
+           { class: '' },
+           { class: '' },
+           { class: 'wide2' }
+         ]
+       },
+       {
+        name: '左T型布局',
+        style: 'background: #fff;',
+        gridClass: 'grid-3-T-shape',
+        gridConfig: {
+          columns: [1, 1], // 1fr 1fr
+          rows: [1, 1],    // 1fr 1fr
+          gap: 8
+        },
+        cells: [
+          { class: 'high2' },
+          { class: '' },
+          { class: '' }
+        ]
+      },
+      {
+        name: '右T型布局',
+        style: 'background: #fff;',
+        gridClass: 'grid-3-T-shape',
+        gridConfig: {
+          columns: [1, 1], // 1fr 1fr
+          rows: [1, 1],    // 1fr 1fr
+          gap: 8
+        },
+        cells: [
+          { class: '' },
+          { class: 'high2' },
+          { class: '' }
+        ]
+      },
+       // 4张图片布局模板
+       {
+         name: '田字格',
+         style: 'background: #fff;',
+         gridClass: 'grid-4-square',
+         gridConfig: {
+           columns: [1, 1], // 1fr 1fr
+           rows: [1, 1],    // 1fr 1fr
+           gap: 8
+         },
+         cells: [
+           { class: '' },
+           { class: '' },
+           { class: '' },
+           { class: '' }
+         ]
+       },
+       {
+         name: '横向四联',
+         style: 'background: #fff;',
+         gridClass: 'grid-4-horizontal',
+         gridConfig: {
+           columns: [1, 1, 1, 1], // 1fr 1fr 1fr 1fr
+           rows: [1],             // 1fr
+           gap: 8
+         },
+         cells: [
+           { class: '' },
+           { class: '' },
+           { class: '' },
+           { class: '' }
+         ]
+       },
+       {
+         name: '竖向四联',
+         style: 'background: #fff;',
+         gridClass: 'grid-4-vertical',
+         gridConfig: {
+           columns: [1],          // 1fr
+           rows: [1, 1, 1, 1],    // 1fr 1fr 1fr 1fr
+           gap: 8
+         },
+         cells: [
+           { class: '' },
+           { class: '' },
+           { class: '' },
+           { class: '' }
+         ]
+       },
+       {
+         name: '正双T型布局',
+         style: 'background: #fff;',
+         gridClass: 'grid-4-2t-shape',
+         gridConfig: {
+           columns: [1, 1, 1], // 1fr 1fr 1fr
+           rows: [1, 1],       // 1fr 1fr
+           gap: 8
+         },
+         cells: [
+           { class: 'wide3' },
+           { class: '' },
+           { class: '' },
+           { class: '' }
+         ]
+       },
+       {
+         name: '左右分割',
+         style: 'background: #fff;',
+         gridClass: 'grid-4-left-right',
+         gridConfig: {
+           columns: [2, 1], // 2fr 1fr
+           rows: [3, 1, 1], // 3fr 1fr 1fr
+           gap: 8
+         },
+         cells: [
+           { class: 'big' },
+           { class: '' },
+           { class: '' },
+           { class: '' }
+         ]
+       },
+       {
+         name: '上下分割',
+         style: 'background: #fff;',
+         gridClass: 'grid-4-top-bottom',
+         gridConfig: {
+           columns: [1, 1, 1], // 1fr 1fr 1fr
+           rows: [2, 1],       // 2fr 1fr
+           gap: 8
+         },
+         cells: [
+           { class: 'big' },
+           { class: '' },
+           { class: '' },
+           { class: '' }
+         ]
+       }
     ]
   },
 

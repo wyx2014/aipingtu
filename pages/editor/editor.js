@@ -803,100 +803,52 @@ Page({
   async drawTemplateLayout(ctx, cellsWithPhotos, template) {
     const canvasWidth = this.data.canvasWidth
     const canvasHeight = this.data.canvasHeight
+    await this.drawCSSGridLayout(ctx, cellsWithPhotos, canvasWidth, canvasHeight, this.data.currentTemplate.gridConfig)
+  },
+
+  // 统一的CSS Grid布局绘制函数
+  async drawCSSGridLayout(ctx, cellsWithPhotos, canvasWidth, canvasHeight, gridConfig) {
+    const { columns, rows, gap = 8 } = gridConfig
     
-    switch (template.gridClass) {
-      case 'grid-3x3':
-        await this.drawGrid3x3(ctx, cellsWithPhotos, canvasWidth, canvasHeight)
-        break
-      case 'grid-big-small':
-        await this.drawGridBigSmall(ctx, cellsWithPhotos, canvasWidth, canvasHeight)
-        break
-      case 'grid-horizontal':
-        await this.drawGridHorizontal(ctx, cellsWithPhotos, canvasWidth, canvasHeight)
-        break
-      case 'grid-vertical':
-        await this.drawGridVertical(ctx, cellsWithPhotos, canvasWidth, canvasHeight)
-        break
-      case 'grid-creative':
-        await this.drawGridCreative(ctx, cellsWithPhotos, canvasWidth, canvasHeight)
-        break
-      default:
-        console.warn('未知的模版类型:', template.gridClass)
-        break
+    // 计算总的gap空间
+    const totalColGaps = (columns.length - 1) * gap
+    const totalRowGaps = (rows.length - 1) * gap
+    
+    // 计算可用于内容的空间
+    const availableWidth = canvasWidth - totalColGaps
+    const availableHeight = canvasHeight - totalRowGaps
+    
+    // 计算每个fr单位的尺寸
+    const totalColFr = columns.reduce((sum, fr) => sum + fr, 0)
+    const totalRowFr = rows.reduce((sum, fr) => sum + fr, 0)
+    const colUnit = availableWidth / totalColFr
+    const rowUnit = availableHeight / totalRowFr
+    
+    // 计算每列和每行的累积位置（包含gap）
+    const colPositions = [0]
+    const rowPositions = [0]
+    
+    for (let i = 0; i < columns.length; i++) {
+      const prevPos = colPositions[i]
+      const colWidth = columns[i] * colUnit
+      colPositions.push(prevPos + colWidth + (i < columns.length - 1 ? gap : 0))
     }
-  },
-
-  // 绘制九宫格布局
-  // 绘制九宫格布局 - 匹配CSS grid布局: 1fr 1fr 1fr (列) x 1fr 1fr 1fr (行)
-  async drawGrid3x3(ctx, cellsWithPhotos, canvasWidth, canvasHeight) {
-    const gap = 8 // 对应CSS中的gap: 8rpx，转换为像素
-    const cellWidth = (canvasWidth - gap * 2) / 3
-    const cellHeight = (canvasHeight - gap * 2) / 3
-    
-    const imagePromises = cellsWithPhotos.map((cell) => {
-      const col = cell.index % 3
-      const row = Math.floor(cell.index / 3)
-      return this.drawImageInCell(ctx, cell, {
-        x: col * (cellWidth + gap),
-        y: row * (cellHeight + gap),
-        width: cellWidth,
-        height: cellHeight
-      })
-    })
-    
-    await Promise.all(imagePromises)
-  },
-
-  // 绘制大图配小图布局
-  // 绘制大图配小图布局 - 匹配CSS grid布局: 2fr 1fr (列) x 2fr 1fr 1fr (行)
-  async drawGridBigSmall(ctx, cellsWithPhotos, canvasWidth, canvasHeight) {
-    // 计算grid布局的尺寸：2fr + 1fr = 3fr总计(列)，2fr + 1fr + 1fr = 4fr总计(行)
-    const colUnit = canvasWidth / 3   // 每个fr单位的宽度
-    const rowUnit = canvasHeight / 4  // 每个fr单位的高度
-    const gap = 8 // 对应CSS中的gap: 8rpx，转换为像素
+    for (let i = 0; i < rows.length; i++) {
+      const prevPos = rowPositions[i]
+      const rowHeight = rows[i] * rowUnit
+      rowPositions.push(prevPos + rowHeight + (i < rows.length - 1 ? gap : 0))
+    }
     
     const imagePromises = cellsWithPhotos.map((cell, index) => {
-      let cellRect
-      if (index === 0) {
-        // 大图：占据2x2的grid区域 (grid-column: 1, grid-row: 1/3)
-        cellRect = {
-          x: 0,
-          y: 0,
-          width: colUnit * 2 - gap/2,
-          height: rowUnit * 2 - gap/2
-        }
-      } else if (index === 1) {
-        // 小图1：第2列第1行 (grid-column: 2, grid-row: 1)
-        cellRect = {
-          x: colUnit * 2 + gap/2,
-          y: 0,
-          width: colUnit - gap/2,
-          height: rowUnit - gap/2
-        }
-      } else if (index === 2) {
-        // 小图2：第2列第2行 (grid-column: 2, grid-row: 2)
-        cellRect = {
-          x: colUnit * 2 + gap/2,
-          y: rowUnit + gap/2,
-          width: colUnit - gap/2,
-          height: rowUnit - gap/2
-        }
-      } else if (index === 3) {
-        // 小图3：第1列第3行 (grid-column: 1, grid-row: 3)
-        cellRect = {
-          x: 0,
-          y: rowUnit * 2 + gap/2,
-          width: colUnit - gap/2,
-          height: rowUnit - gap/2
-        }
-      } else if (index === 4) {
-        // 小图4：第2列第3行 (grid-column: 2, grid-row: 3)
-        cellRect = {
-          x: colUnit * 2 + gap/2,
-          y: rowUnit * 2 + gap/2,
-          width: colUnit - gap/2,
-          height: rowUnit - gap/2
-        }
+      // 获取cell的grid位置信息
+      const cellInfo = this.getCellGridPosition(index, cell.class, columns.length, rows.length, cellsWithPhotos)
+      const { startCol, endCol, startRow, endRow } = cellInfo
+      
+      const cellRect = {
+        x: colPositions[startCol],
+        y: rowPositions[startRow],
+        width: colPositions[endCol] - colPositions[startCol] - (endCol < columns.length ? gap : 0),
+        height: rowPositions[endRow] - rowPositions[startRow] - (endRow < rows.length ? gap : 0)
       }
       
       return this.drawImageInCell(ctx, cell, cellRect)
@@ -904,104 +856,69 @@ Page({
     
     await Promise.all(imagePromises)
   },
-
-  // 绘制横向拼接布局 - 匹配CSS grid布局: 1fr 1fr (列) x 1fr (行)
-  async drawGridHorizontal(ctx, cellsWithPhotos, canvasWidth, canvasHeight) {
-    const gap = 8 // 对应CSS中的gap: 8rpx，转换为像素
-    const cellWidth = (canvasWidth - gap) / 2
+  
+  // 获取cell在grid中的位置信息
+  getCellGridPosition(index, cellClass, colCount, rowCount, cellsWithPhotos) {
+    let startCol, endCol, startRow, endRow
     
-    const imagePromises = cellsWithPhotos.map((cell, index) => {
-      return this.drawImageInCell(ctx, cell, {
-        x: index * (cellWidth + gap),
-        y: 0,
-        width: cellWidth,
-        height: canvasHeight
-      })
-    })
+    if (cellClass === 'big') {
+      // big类：span 2列2行，从第1列第1行开始
+      startCol = 0
+      endCol = Math.min(2, colCount) // 确保不超出列数
+      startRow = 0
+      endRow = Math.min(2, rowCount) // 确保不超出行数
+    } else {
+      // 检查是否真的有big类cell
+      const hasBigCell = cellsWithPhotos && cellsWithPhotos.some(cell => cell.class === 'big')
+      
+      // 普通cell：按顺序排列
+      const positions = this.calculateNormalCellPositions(colCount, rowCount, hasBigCell)
+      
+      const posIndex = hasBigCell ? index - 1 : index // 如果有big类，则跳过第一个
+      
+      const pos = positions[posIndex]
+      if (pos) {
+        startCol = pos.col
+        endCol = pos.col + 1
+        startRow = pos.row
+        endRow = pos.row + 1
+      }
+    }
     
-    await Promise.all(imagePromises)
+    return { startCol, endCol, startRow, endRow }
+  },
+  
+  // 计算普通cell的位置（跳过big占用的区域）
+  calculateNormalCellPositions(colCount, rowCount, hasBigCell = false) {
+    const positions = []
+    const occupied = new Set()
+    
+    // 只有在真正有big类cell时才标记占用的位置
+    if (hasBigCell) {
+      const bigEndCol = Math.min(2, colCount)
+      const bigEndRow = Math.min(2, rowCount)
+      for (let row = 0; row < bigEndRow; row++) {
+        for (let col = 0; col < bigEndCol; col++) {
+          occupied.add(`${row}-${col}`)
+        }
+      }
+    }
+    
+    // 按行列顺序找可用位置
+    for (let row = 0; row < rowCount; row++) {
+      for (let col = 0; col < colCount; col++) {
+        if (!occupied.has(`${row}-${col}`)) {
+          positions.push({ row, col })
+        }
+      }
+    }
+    
+    return positions
   },
 
-  // 绘制竖向拼接布局 - 匹配CSS grid布局: 1fr (列) x 1fr 1fr (行)
-  async drawGridVertical(ctx, cellsWithPhotos, canvasWidth, canvasHeight) {
-    const gap = 8 // 对应CSS中的gap: 8rpx，转换为像素
-    const cellHeight = (canvasHeight - gap) / 2
-    
-    const imagePromises = cellsWithPhotos.map((cell, index) => {
-      return this.drawImageInCell(ctx, cell, {
-        x: 0,
-        y: index * (cellHeight + gap),
-        width: canvasWidth,
-        height: cellHeight
-      })
-    })
-    
-    await Promise.all(imagePromises)
-  },
-
-  // 绘制创意布局 - 匹配CSS grid布局: 2fr 1fr 1fr (列) x 2fr 1fr 1fr (行)
+  // 绘制创意布局 - 使用统一的CSS Grid函数
   async drawGridCreative(ctx, cellsWithPhotos, canvasWidth, canvasHeight) {
-    // 计算grid布局的尺寸：2fr + 1fr + 1fr = 4fr总计
-    const colUnit = canvasWidth / 4  // 每个fr单位的宽度
-    const rowUnit = canvasHeight / 4 // 每个fr单位的高度
-    const gap = 8 // 对应CSS中的gap: 8rpx，转换为像素
-    
-    const imagePromises = cellsWithPhotos.map((cell, index) => {
-      let cellRect
-      if (index === 0) {
-        // 大图：占据2x2的grid区域 (grid-column: 1/3, grid-row: 1/3)
-        cellRect = {
-          x: 0,
-          y: 0,
-          width: colUnit * 2 - gap/2,
-          height: rowUnit * 2 - gap/2
-        }
-      } else if (index === 1) {
-        // 小图1：第3列第1行 (grid-column: 3, grid-row: 1)
-        cellRect = {
-          x: colUnit * 3 + gap/2,
-          y: 0,
-          width: colUnit - gap/2,
-          height: rowUnit - gap/2
-        }
-      } else if (index === 2) {
-        // 小图2：第3列第2行 (grid-column: 3, grid-row: 2)
-        cellRect = {
-          x: colUnit * 3 + gap/2,
-          y: rowUnit + gap/2,
-          width: colUnit - gap/2,
-          height: rowUnit - gap/2
-        }
-      } else if (index === 3) {
-        // 小图3：第1列第3行 (grid-column: 1, grid-row: 3)
-        cellRect = {
-          x: 0,
-          y: rowUnit * 2 + gap/2,
-          width: colUnit - gap/2,
-          height: rowUnit - gap/2
-        }
-      } else if (index === 4) {
-        // 小图4：第2列第3行 (grid-column: 2, grid-row: 3)
-        cellRect = {
-          x: colUnit + gap/2,
-          y: rowUnit * 2 + gap/2,
-          width: colUnit - gap/2,
-          height: rowUnit - gap/2
-        }
-      } else if (index === 5) {
-        // 小图5：第3列第3行 (grid-column: 3, grid-row: 3)
-        cellRect = {
-          x: colUnit * 3 + gap/2,
-          y: rowUnit * 2 + gap/2,
-          width: colUnit - gap/2,
-          height: rowUnit - gap/2
-        }
-      }
-      
-      return this.drawImageInCell(ctx, cell, cellRect)
-    })
-    
-    await Promise.all(imagePromises)
+    await this.drawCSSGridLayout(ctx, cellsWithPhotos, canvasWidth, canvasHeight, this.data.currentTemplate.gridConfig)
   },
 
   // 在指定区域绘制图片
