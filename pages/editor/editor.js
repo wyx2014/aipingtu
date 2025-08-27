@@ -195,8 +195,6 @@ Page({
       gridCells,
       remainingPhotos
     })
-    
-    console.log('初始化布局:', { gridCells, remainingPhotos, template, gridClass })
   },
 
   // 解析样式值（已废弃，保留以防其他地方调用）

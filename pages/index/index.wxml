@@ -2,7 +2,7 @@
 <view class="container">
   <!-- 头部标题 -->
   <view class="header">
-    <text class="title">创意拼图</text>
+    <!-- <text class="title">创意拼图</text> -->
     <text class="subtitle">让你的照片更有趣</text>
   </view>
 

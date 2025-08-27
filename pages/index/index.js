@@ -20,7 +20,6 @@ Page({
       {
         name: '经典九宫格',
         style: 'background: #fff;',
-        gridClass: 'grid-3x3',
         gridConfig: {
           columns: [1, 1, 1], // 1fr 1fr 1fr
           rows: [1, 1, 1],    // 1fr 1fr 1fr
@@ -41,7 +40,6 @@ Page({
       {
         name: '大图配小图',
         style: 'background: #fff;',
-        gridClass: 'grid-big-small',
         gridConfig: {
           columns: [2, 1], // 2fr 1fr
           rows: [2, 1, 1], // 2fr 1fr 1fr
@@ -56,7 +54,6 @@ Page({
       {
         name: '横向拼接',
         style: 'background: #fff;',
-        gridClass: 'grid-horizontal',
         gridConfig: {
           columns: [1, 1], // 1fr 1fr
           rows: [1],       // 1fr
@@ -70,7 +67,6 @@ Page({
       {
         name: '竖向拼接',
         style: 'background: #fff;',
-        gridClass: 'grid-vertical',
         gridConfig: {
           columns: [1],    // 1fr
           rows: [1, 1],    // 1fr 1fr
@@ -84,7 +80,6 @@ Page({
       {
         name: '创意布局',
         style: 'background: #fff;',
-        gridClass: 'grid-creative',
         gridConfig: {
           columns: [2, 1, 1], // 2fr 1fr 1fr
           rows: [2, 1, 1],    // 2fr 1fr 1fr
@@ -103,7 +98,6 @@ Page({
       {
         name: '横向三联',
         style: 'background: #fff;',
-        gridClass: 'grid-3-horizontal',
         gridConfig: {
           columns: [1, 1, 1], // 1fr 1fr 1fr
           rows: [1],          // 1fr
@@ -118,7 +112,6 @@ Page({
       {
         name: '竖向三联',
         style: 'background: #fff;',
-        gridClass: 'grid-3-vertical',
         gridConfig: {
           columns: [1],       // 1fr
           rows: [1, 1, 1],    // 1fr 1fr 1fr
@@ -133,7 +126,6 @@ Page({
       {
         name: 'T型布局',
         style: 'background: #fff;',
-        gridClass: 'grid-3-T-shape',
         gridConfig: {
           columns: [1, 1], // 1fr 1fr
           rows: [1, 1],    // 1fr 1fr
@@ -148,7 +140,6 @@ Page({
       {
         name: '倒T型布局',
         style: 'background: #fff;',
-        gridClass: 'grid-3-T-shape',
         gridConfig: {
           columns: [1, 1], // 1fr 1fr
           rows: [1, 1],    // 1fr 1fr
@@ -163,7 +154,6 @@ Page({
       {
         name: '左T型布局',
         style: 'background: #fff;',
-        gridClass: 'grid-3-T-shape',
         gridConfig: {
           columns: [1, 1], // 1fr 1fr
           rows: [1, 1],    // 1fr 1fr
@@ -178,7 +168,6 @@ Page({
       {
         name: '右T型布局',
         style: 'background: #fff;',
-        gridClass: 'grid-3-T-shape',
         gridConfig: {
           columns: [1, 1], // 1fr 1fr
           rows: [1, 1],    // 1fr 1fr
@@ -194,7 +183,6 @@ Page({
       {
         name: '田字格',
         style: 'background: #fff;',
-        gridClass: 'grid-4-square',
         gridConfig: {
           columns: [1, 1], // 1fr 1fr
           rows: [1, 1],    // 1fr 1fr
@@ -210,7 +198,6 @@ Page({
       {
         name: '横向四联',
         style: 'background: #fff;',
-        gridClass: 'grid-4-horizontal',
         gridConfig: {
           columns: [1, 1, 1, 1], // 1fr 1fr 1fr 1fr
           rows: [1],             // 1fr
@@ -226,7 +213,6 @@ Page({
       {
         name: '竖向四联',
         style: 'background: #fff;',
-        gridClass: 'grid-4-vertical',
         gridConfig: {
           columns: [1],          // 1fr
           rows: [1, 1, 1, 1],    // 1fr 1fr 1fr 1fr
@@ -242,7 +228,6 @@ Page({
       {
         name: '正双T型布局',
         style: 'background: #fff;',
-        gridClass: 'grid-4-2t-shape',
         gridConfig: {
           columns: [1, 1, 1], // 1fr 1fr 1fr
           rows: [1, 1],       // 1fr 1fr
@@ -258,7 +243,6 @@ Page({
       {
         name: '反双T型布局',
         style: 'background: #fff;',
-        gridClass: 'grid-4-2t-shape',
         gridConfig: {
           columns: [1, 1, 1], // 1fr 1fr 1fr
           rows: [1, 1],       // 1fr 1fr
@@ -274,7 +258,6 @@ Page({
       {
         name: '左双T型布局',
         style: 'background: #fff;',
-        gridClass: 'grid-4-2ft-shape',
         gridConfig: {
           columns: [1, 1], // 1fr 1fr
           rows: [1, 1, 1], // 1fr 1fr 1fr
@@ -290,7 +273,6 @@ Page({
       {
         name: '右双T型布局',
         style: 'background: #fff;',
-        gridClass: 'grid-4-2ft-shape',
         gridConfig: {
           columns: [1, 1], // 1fr 1fr
           rows: [1, 1, 1], // 1fr 1fr 1fr
