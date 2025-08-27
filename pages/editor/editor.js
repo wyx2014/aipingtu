@@ -861,61 +861,79 @@ Page({
   
   // 获取cell在grid中的位置信息
   getCellGridPosition(index, cellClass, colCount, rowCount, cellsWithPhotos) {
-    let startCol, endCol, startRow, endRow
-    
-    if (cellClass === 'big') {
-      // big类：span 2列2行，从第1列第1行开始
-      startCol = 0
-      endCol = Math.min(2, colCount) // 确保不超出列数
-      startRow = 0
-      endRow = Math.min(2, rowCount) // 确保不超出行数
-    } else {
-      // 检查是否真的有big类cell
-      const hasBigCell = cellsWithPhotos && cellsWithPhotos.some(cell => cell.class === 'big')
-      
-      // 普通cell：按顺序排列
-      const positions = this.calculateNormalCellPositions(colCount, rowCount, hasBigCell)
-      
-      const posIndex = hasBigCell ? index - 1 : index // 如果有big类，则跳过第一个
-      
-      const pos = positions[posIndex]
-      if (pos) {
-        startCol = pos.col
-        endCol = pos.col + 1
-        startRow = pos.row
-        endRow = pos.row + 1
-      }
+    // 使用新的columnSpan和rowSpan属性来计算位置
+    const currentCell = cellsWithPhotos[index]
+    if (!currentCell) {
+      return { startCol: 0, endCol: 1, startRow: 0, endRow: 1 }
     }
+    
+    const columnSpan = currentCell.columnSpan || 1
+    const rowSpan = currentCell.rowSpan || 1
+    
+    // 计算当前cell应该放置的位置
+    const position = this.calculateCellPosition(index, cellsWithPhotos, colCount, rowCount)
+    
+    const startCol = position.col
+    const endCol = Math.min(startCol + columnSpan, colCount)
+    const startRow = position.row
+    const endRow = Math.min(startRow + rowSpan, rowCount)
     
     return { startCol, endCol, startRow, endRow }
   },
   
-  // 计算普通cell的位置（跳过big占用的区域）
-  calculateNormalCellPositions(colCount, rowCount, hasBigCell = false) {
-    const positions = []
+  // 计算cell在grid中的位置，考虑columnSpan和rowSpan
+  calculateCellPosition(index, cellsWithPhotos, colCount, rowCount) {
     const occupied = new Set()
     
-    // 只有在真正有big类cell时才标记占用的位置
-    if (hasBigCell) {
-      const bigEndCol = Math.min(2, colCount)
-      const bigEndRow = Math.min(2, rowCount)
-      for (let row = 0; row < bigEndRow; row++) {
-        for (let col = 0; col < bigEndCol; col++) {
+    // 遍历之前的所有cell，标记它们占用的位置
+    for (let i = 0; i < index; i++) {
+      const cell = cellsWithPhotos[i]
+      if (!cell) continue
+      
+      const columnSpan = cell.columnSpan || 1
+      const rowSpan = cell.rowSpan || 1
+      
+      // 找到这个cell的位置
+      const cellPos = this.findAvailablePosition(occupied, colCount, rowCount, columnSpan, rowSpan)
+      
+      // 标记这个cell占用的所有位置
+      for (let row = cellPos.row; row < cellPos.row + rowSpan; row++) {
+        for (let col = cellPos.col; col < cellPos.col + columnSpan; col++) {
           occupied.add(`${row}-${col}`)
         }
       }
     }
     
-    // 按行列顺序找可用位置
-    for (let row = 0; row < rowCount; row++) {
-      for (let col = 0; col < colCount; col++) {
-        if (!occupied.has(`${row}-${col}`)) {
-          positions.push({ row, col })
+    // 为当前cell找到可用位置
+    const currentCell = cellsWithPhotos[index]
+    const columnSpan = currentCell.columnSpan || 1
+    const rowSpan = currentCell.rowSpan || 1
+    
+    return this.findAvailablePosition(occupied, colCount, rowCount, columnSpan, rowSpan)
+  },
+  
+  // 找到可以放置指定大小cell的第一个可用位置
+  findAvailablePosition(occupied, colCount, rowCount, columnSpan, rowSpan) {
+    for (let row = 0; row <= rowCount - rowSpan; row++) {
+      for (let col = 0; col <= colCount - columnSpan; col++) {
+        // 检查这个位置是否可以放置指定大小的cell
+        let canPlace = true
+        for (let r = row; r < row + rowSpan && canPlace; r++) {
+          for (let c = col; c < col + columnSpan && canPlace; c++) {
+            if (occupied.has(`${r}-${c}`)) {
+              canPlace = false
+            }
+          }
+        }
+        
+        if (canPlace) {
+          return { row, col }
         }
       }
     }
     
-    return positions
+    // 如果找不到合适位置，返回默认位置
+    return { row: 0, col: 0 }
   },
 
   // 绘制创意布局 - 使用统一的CSS Grid函数

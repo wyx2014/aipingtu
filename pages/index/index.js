@@ -243,38 +243,6 @@ Page({
            { class: '' },
            { class: '' }
          ]
-       },
-       {
-         name: '左右分割',
-         style: 'background: #fff;',
-         gridClass: 'grid-4-left-right',
-         gridConfig: {
-           columns: [2, 1], // 2fr 1fr
-           rows: [3, 1, 1], // 3fr 1fr 1fr
-           gap: 8
-         },
-         cells: [
-           { class: 'big' },
-           { class: '' },
-           { class: '' },
-           { class: '' }
-         ]
-       },
-       {
-         name: '上下分割',
-         style: 'background: #fff;',
-         gridClass: 'grid-4-top-bottom',
-         gridConfig: {
-           columns: [1, 1, 1], // 1fr 1fr 1fr
-           rows: [2, 1],       // 2fr 1fr
-           gap: 8
-         },
-         cells: [
-           { class: 'big' },
-           { class: '' },
-           { class: '' },
-           { class: '' }
-         ]
        }
     ]
   },
