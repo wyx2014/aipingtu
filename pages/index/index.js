@@ -37,7 +37,7 @@ Page({
           gap: 8
         },
         cells: [
-          { class: 'big2' },
+          { class: '', columnSpan: 2, rowSpan: 2 },
           { class: '' },
           { class: '' },
         ]
@@ -80,7 +80,7 @@ Page({
           gap: 8
         },
         cells: [
-          { class: 'big2' },
+          { class: '', columnSpan: 2, rowSpan: 2 },
           { class: '' },
           { class: '' },
           { class: '' },
@@ -129,7 +129,7 @@ Page({
           gap: 8
         },
         cells: [
-          { class: 'wide2' },
+          { class: '', columnSpan: 2 },
           { class: '' },
           { class: '' }
         ]
@@ -146,7 +146,7 @@ Page({
          cells: [
            { class: '' },
            { class: '' },
-           { class: 'wide2' }
+           { class: '', columnSpan: 2 }
          ]
        },
        {
@@ -159,7 +159,7 @@ Page({
           gap: 8
         },
         cells: [
-          { class: 'high2' },
+          { class: '', rowSpan: 2  },
           { class: '' },
           { class: '' }
         ]
@@ -175,7 +175,7 @@ Page({
         },
         cells: [
           { class: '' },
-          { class: 'high2' },
+          { class: '', rowSpan: 2 },
           { class: '' }
         ]
       },
@@ -238,7 +238,7 @@ Page({
            gap: 8
          },
          cells: [
-           { class: 'wide3' },
+           { class: '', columnSpan: 3 },
            { class: '' },
            { class: '' },
            { class: '' }

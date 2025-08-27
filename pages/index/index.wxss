@@ -269,25 +269,6 @@
   border-radius: 4rpx;
 }
 
-.grid-cell.wide2 {
-  grid-row: span 1;
-  grid-column: span 2;
-}
-.grid-cell.wide3 {
-  grid-row: span 1;
-  grid-column: span 3;
-}
-
-.grid-cell.high2 {
-  grid-row: span 2;
-  grid-column: span 1;
-}
-
-.grid-cell.big2 {
-  grid-row: span 2;
-  grid-column: span 2;
-}
-
 .template-name {
   font-size: 24rpx;
   color: #666;

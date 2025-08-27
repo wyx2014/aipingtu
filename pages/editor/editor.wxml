@@ -19,12 +19,15 @@
       <view 
         class="grid-cell {{item.class || ''}} {{dragOverCell === index ? 'drag-over' : ''}}"
         wx:for="{{gridCells}}" 
+        wx:for-item="cell"
         wx:key="index"
         data-cell-index="{{index}}"
         bindtouchstart="onCellTouchStart"
         bindtouchmove="onCellTouchMove"
         bindtouchend="onCellTouchEnd"
-        bindtap="onCellTap">
+        bindtap="onCellTap"
+        style="grid-column: span {{cell.columnSpan}}; grid-row: span {{cell.rowSpan}};"
+        >
         
         <!-- 格子中的图片 -->
         <view wx:if="{{item.photoSrc}}" class="cell-photo {{draggingCell === index ? 'dragging' : ''}}">

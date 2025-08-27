@@ -149,6 +149,8 @@ Page({
       gridCells.push({
         index: i,
         class: cell.class || '',
+        columnSpan: cell.columnSpan || 1,
+        rowSpan: cell.rowSpan || 1,
         photoSrc: photo,
         originalPhotoSrc: photo // 保存原始图片路径
       })

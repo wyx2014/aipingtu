@@ -42,7 +42,12 @@
               data-index="{{index}}">
           <view class="template-preview" style="{{item.style}}">
             <view class="template-grid {{item.gridClass}}">
-              <view class="grid-cell {{cell.class}}" wx:for="{{item.cells}}" wx:for-item="cell" wx:key="cellIndex"></view>
+              <view class="grid-cell {{cell.class}}" 
+                    wx:for="{{item.cells}}" 
+                    wx:for-item="cell" 
+                    wx:key="cellIndex"
+                    style="grid-column: span {{cell.columnSpan}}; grid-row: span {{cell.rowSpan}};">
+              </view>
             </view>
           </view>
           <text class="template-name">{{item.name}}</text>

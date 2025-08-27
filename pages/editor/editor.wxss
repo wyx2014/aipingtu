@@ -205,25 +205,6 @@
   transform: scale(1.05);
 }
 
-.grid-cell.wide2 {
-  grid-row: span 1;
-  grid-column: span 2;
-}
-.grid-cell.wide3 {
-  grid-row: span 1;
-  grid-column: span 3;
-}
-
-.grid-cell.high2 {
-  grid-row: span 2;
-  grid-column: span 1;
-}
-
-.grid-cell.big2 {
-  grid-row: span 2;
-  grid-column: span 2;
-}
-
 /* 格子中的图片 */
 .cell-photo {
   width: 100%;
