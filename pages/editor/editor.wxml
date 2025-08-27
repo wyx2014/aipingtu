@@ -1,18 +1,5 @@
 <!--editor.wxml-->
 <view class="container">
-  <!-- 顶部工具栏 -->
-  <view class="toolbar">
-    <view class="toolbar-left">
-      <text class="back-btn" bindtap="goBack">‹ 返回</text>
-    </view>
-    <view class="toolbar-center">
-      <!-- <text class="title">开始创作吧</text> -->
-    </view>
-    <view class="toolbar-right">
-      <text class="save-btn" bindtap="savePuzzle">保存</text>
-    </view>
-  </view>
-
   <!-- 九宫格编辑区域 -->
   <view class="grid-editor-container">
     <view class="grid-template {{currentTemplate.gridClass}}" style="width: {{canvasWidth}}px; height: {{canvasHeight}}px;">
@@ -54,6 +41,21 @@
     </view>
   </view>
 
+  <!-- 底部工具栏 -->
+  <view class="bottom-toolbar">  
+    <!-- 功能按钮 -->
+    <view class="function-buttons">
+      <view class="func-btn">
+        <text class="func-label">布局</text>
+      </view>
+      <view class="func-btn">
+        <text class="func-label">边框</text>
+      </view>
+      <view class="func-btn save-btn" bindtap="savePuzzle">
+        <text class="func-label">保存</text>
+      </view>
+    </view>
+  </view>
 
   <!-- 图片裁剪弹窗 -->
   <view class="crop-modal {{showCropModal ? 'show' : ''}}">

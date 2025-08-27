@@ -13,6 +13,11 @@ Page({
     touchStartTime: 0,
     lastTapTime: 0, // 用于双击检测
     
+    // 模板选择相关
+    templateCount: 9, // 当前选择的模板数量
+    filteredTemplates: [], // 过滤后的模板列表
+    allTemplates: [], // 所有模板数据
+    
     // 滤镜相关
     showFilterModal: false,
     currentFilter: 'none',
@@ -71,6 +76,9 @@ Page({
     // 初始化画布和照片
     await this.initCanvas()
     this.loadPhotos()
+    
+    // 初始化模板数据
+    this.initTemplates()
   },
 
   // 初始化画布
@@ -992,6 +1000,79 @@ Page({
       }
       img.src = cell.photoSrc
     })
+  },
+
+  // 初始化模板数据
+  initTemplates() {
+    // 这里可以从服务器或本地加载模板数据
+    const allTemplates = [
+      // 示例模板数据
+      {
+        id: 1,
+        name: '经典九宫格',
+        count: 9,
+        gridClass: 'grid-3x3',
+        gridConfig: {
+          columns: [1, 1, 1],
+          rows: [1, 1, 1],
+          gap: 8
+        },
+        cells: Array.from({length: 9}, (_, i) => ({
+          class: '',
+          columnSpan: 1,
+          rowSpan: 1
+        }))
+      },
+      {
+        id: 2,
+        name: '四宫格',
+        count: 4,
+        gridClass: 'grid-2x2',
+        gridConfig: {
+          columns: [1, 1],
+          rows: [1, 1],
+          gap: 8
+        },
+        cells: Array.from({length: 4}, (_, i) => ({
+          class: '',
+          columnSpan: 1,
+          rowSpan: 1
+        }))
+      }
+    ]
+    
+    this.setData({
+      allTemplates,
+      filteredTemplates: allTemplates.filter(t => t.count === this.data.templateCount)
+    })
+  },
+
+  // 模板数量选择
+  onTemplateCountChange(e) {
+    const count = parseInt(e.detail.value)
+    const filteredTemplates = this.data.allTemplates.filter(t => t.count === count)
+    
+    this.setData({
+      templateCount: count,
+      filteredTemplates
+    })
+  },
+
+  // 选择模板
+  selectTemplate(e) {
+    const templateId = e.currentTarget.dataset.templateId
+    const template = this.data.allTemplates.find(t => t.id === templateId)
+    
+    if (template) {
+      // 重新初始化布局
+      const selectedPhotos = app.globalData.selectedPhotos || []
+      this.initGridLayout(selectedPhotos, template)
+      
+      wx.showToast({
+        title: `已切换到${template.name}`,
+        icon: 'success'
+      })
+    }
   },
 
   // 返回
