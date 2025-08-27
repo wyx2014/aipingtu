@@ -1,6 +1,17 @@
 // editor.js
 const app = getApp()
 
+// 动态生成CSS Grid样式
+function generateGridStyle(gridConfig) {
+  const { columns, rows, gap } = gridConfig;
+  
+  // 将数组转换为CSS Grid的fr单位
+  const gridTemplateColumns = columns.map(col => `${col}fr`).join(' ');
+  const gridTemplateRows = rows.map(row => `${row}fr`).join(' ');
+  
+  return `grid-template-columns: ${gridTemplateColumns}; grid-template-rows: ${gridTemplateRows}; gap: ${gap}rpx;`;
+}
+
 Page({
   data: {
     canvasWidth: 300,
@@ -136,15 +147,28 @@ Page({
   initGridLayout(photos, template) {
     const gridCells = []
     
-    // 根据模版设置网格类名
-    let gridClass = 'grid-3x3' // 默认九宫格
-    if (template && template.gridClass) {
-      gridClass = template.gridClass
+    // 默认模板配置
+    const defaultTemplate = {
+      gridConfig: {
+        columns: [1, 1, 1], // 1fr 1fr 1fr
+        rows: [1, 1, 1],    // 1fr 1fr 1fr
+        gap: 8
+      },
+      cells: [{}, {}, {}, {}, {}, {}, {}, {}, {}]
     }
+    
+    // 使用传入的模板或默认模板
+    const currentTemplate = template || defaultTemplate
+    
+    // 生成动态样式
+    const gridStyle = generateGridStyle(currentTemplate.gridConfig)
     
     // 设置当前模板
     this.setData({
-      currentTemplate: { ...template, gridClass } || { gridClass: 'grid-3x3', cells: [] }
+      currentTemplate: {
+        ...currentTemplate,
+        style: `background: #fff; ${gridStyle}`
+      }
     })
     
     // 创建格子

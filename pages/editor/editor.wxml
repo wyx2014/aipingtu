@@ -2,7 +2,7 @@
 <view class="container">
   <!-- 九宫格编辑区域 -->
   <view class="grid-editor-container">
-    <view class="grid-template {{currentTemplate.gridClass}}" style="width: {{canvasWidth}}px; height: {{canvasHeight}}px;">
+    <view class="grid-template" style="width: {{canvasWidth}}px; height: {{canvasHeight}}px; {{currentTemplate.style}}">
       <view 
         class="grid-cell {{cell.class || ''}} {{dragOverCell === index ? 'drag-over' : ''}}"
         wx:for="{{gridCells}}" 

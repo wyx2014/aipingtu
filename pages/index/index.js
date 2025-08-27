@@ -1,6 +1,17 @@
 // index.js
 const app = getApp()
 
+// 动态生成CSS Grid样式
+function generateGridStyle(gridConfig) {
+  const { columns, rows, gap } = gridConfig;
+  
+  // 将数组转换为CSS Grid的fr单位
+  const gridTemplateColumns = columns.map(col => `${col}fr`).join(' ');
+  const gridTemplateRows = rows.map(row => `${row}fr`).join(' ');
+  
+  return `grid-template-columns: ${gridTemplateColumns}; grid-template-rows: ${gridTemplateRows}; gap: ${gap}rpx;`;
+}
+
 Page({
   data: {
     selectedPhotos: [],
@@ -304,6 +315,19 @@ Page({
   onLoad() {
     // 页面加载时的逻辑
     console.log('首页加载完成')
+    
+    // 为每个模板生成动态样式
+    const templates = this.data.templates.map(template => {
+      const gridStyle = generateGridStyle(template.gridConfig);
+      return {
+        ...template,
+        style: `background: #fff; ${gridStyle}`
+      };
+    });
+    
+    this.setData({
+      templates: templates
+    });
   },
 
   onShow() {
