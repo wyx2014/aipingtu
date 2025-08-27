@@ -16,15 +16,15 @@ Page({
           gap: 8
         },
         cells: [
-          { class: '' },
-          { class: '' },
-          { class: '' },
-          { class: '' },
-          { class: '' },
-          { class: '' },
-          { class: '' },
-          { class: '' },
-          { class: '' }
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {}
         ]
       },
       {
@@ -37,9 +37,9 @@ Page({
           gap: 8
         },
         cells: [
-          { class: '', columnSpan: 2, rowSpan: 2 },
-          { class: '' },
-          { class: '' },
+          { columnSpan: 2, rowSpan: 2 },
+          {},
+          {},
         ]
       },
       {
@@ -52,8 +52,8 @@ Page({
           gap: 8
         },
         cells: [
-          { class: '' },
-          { class: '' }
+          {},
+          {}
         ]
       },
       {
@@ -66,8 +66,8 @@ Page({
           gap: 8
         },
         cells: [
-          { class: '' },
-          { class: '' }
+          {},
+          {}
         ]
       },
       {
@@ -80,12 +80,12 @@ Page({
           gap: 8
         },
         cells: [
-          { class: '', columnSpan: 2, rowSpan: 2 },
-          { class: '' },
-          { class: '' },
-          { class: '' },
-          { class: '' },
-          { class: '' }
+          { columnSpan: 2, rowSpan: 2 },
+          {},
+          {},
+          {},
+          {},
+          {}
         ]
       },
       // 3张图片布局模板
@@ -99,9 +99,9 @@ Page({
           gap: 8
         },
         cells: [
-          { class: '' },
-          { class: '' },
-          { class: '' }
+          {},
+          {},
+          {}
         ]
       },
       {
@@ -114,9 +114,9 @@ Page({
           gap: 8
         },
         cells: [
-          { class: '' },
-          { class: '' },
-          { class: '' }
+          {},
+          {},
+          {}
         ]
       },
       {
@@ -129,27 +129,27 @@ Page({
           gap: 8
         },
         cells: [
-          { class: '', columnSpan: 2 },
-          { class: '' },
-          { class: '' }
+          { columnSpan: 2 },
+          {},
+          {}
         ]
       },
       {
-         name: '倒T型布局',
-         style: 'background: #fff;',
-         gridClass: 'grid-3-T-shape',
-         gridConfig: {
-           columns: [1, 1], // 1fr 1fr
-           rows: [1, 1],    // 1fr 1fr
-           gap: 8
-         },
-         cells: [
-           { class: '' },
-           { class: '' },
-           { class: '', columnSpan: 2 }
-         ]
-       },
-       {
+        name: '倒T型布局',
+        style: 'background: #fff;',
+        gridClass: 'grid-3-T-shape',
+        gridConfig: {
+          columns: [1, 1], // 1fr 1fr
+          rows: [1, 1],    // 1fr 1fr
+          gap: 8
+        },
+        cells: [
+          {},
+          {},
+          { columnSpan: 2 }
+        ]
+      },
+      {
         name: '左T型布局',
         style: 'background: #fff;',
         gridClass: 'grid-3-T-shape',
@@ -159,9 +159,9 @@ Page({
           gap: 8
         },
         cells: [
-          { class: '', rowSpan: 2  },
-          { class: '' },
-          { class: '' }
+          { rowSpan: 2 },
+          {},
+          {}
         ]
       },
       {
@@ -174,76 +174,124 @@ Page({
           gap: 8
         },
         cells: [
-          { class: '' },
-          { class: '', rowSpan: 2 },
-          { class: '' }
+          {},
+          { rowSpan: 2 },
+          {}
         ]
       },
-       // 4张图片布局模板
-       {
-         name: '田字格',
-         style: 'background: #fff;',
-         gridClass: 'grid-4-square',
-         gridConfig: {
-           columns: [1, 1], // 1fr 1fr
-           rows: [1, 1],    // 1fr 1fr
-           gap: 8
-         },
-         cells: [
-           { class: '' },
-           { class: '' },
-           { class: '' },
-           { class: '' }
-         ]
-       },
-       {
-         name: '横向四联',
-         style: 'background: #fff;',
-         gridClass: 'grid-4-horizontal',
-         gridConfig: {
-           columns: [1, 1, 1, 1], // 1fr 1fr 1fr 1fr
-           rows: [1],             // 1fr
-           gap: 8
-         },
-         cells: [
-           { class: '' },
-           { class: '' },
-           { class: '' },
-           { class: '' }
-         ]
-       },
-       {
-         name: '竖向四联',
-         style: 'background: #fff;',
-         gridClass: 'grid-4-vertical',
-         gridConfig: {
-           columns: [1],          // 1fr
-           rows: [1, 1, 1, 1],    // 1fr 1fr 1fr 1fr
-           gap: 8
-         },
-         cells: [
-           { class: '' },
-           { class: '' },
-           { class: '' },
-           { class: '' }
-         ]
-       },
-       {
-         name: '正双T型布局',
-         style: 'background: #fff;',
-         gridClass: 'grid-4-2t-shape',
-         gridConfig: {
-           columns: [1, 1, 1], // 1fr 1fr 1fr
-           rows: [1, 1],       // 1fr 1fr
-           gap: 8
-         },
-         cells: [
-           { class: '', columnSpan: 3 },
-           { class: '' },
-           { class: '' },
-           { class: '' }
-         ]
-       }
+      // 4张图片布局模板
+      {
+        name: '田字格',
+        style: 'background: #fff;',
+        gridClass: 'grid-4-square',
+        gridConfig: {
+          columns: [1, 1], // 1fr 1fr
+          rows: [1, 1],    // 1fr 1fr
+          gap: 8
+        },
+        cells: [
+          {},
+          {},
+          {},
+          {}
+        ]
+      },
+      {
+        name: '横向四联',
+        style: 'background: #fff;',
+        gridClass: 'grid-4-horizontal',
+        gridConfig: {
+          columns: [1, 1, 1, 1], // 1fr 1fr 1fr 1fr
+          rows: [1],             // 1fr
+          gap: 8
+        },
+        cells: [
+          {},
+          {},
+          {},
+          {}
+        ]
+      },
+      {
+        name: '竖向四联',
+        style: 'background: #fff;',
+        gridClass: 'grid-4-vertical',
+        gridConfig: {
+          columns: [1],          // 1fr
+          rows: [1, 1, 1, 1],    // 1fr 1fr 1fr 1fr
+          gap: 8
+        },
+        cells: [
+          {},
+          {},
+          {},
+          {}
+        ]
+      },
+      {
+        name: '正双T型布局',
+        style: 'background: #fff;',
+        gridClass: 'grid-4-2t-shape',
+        gridConfig: {
+          columns: [1, 1, 1], // 1fr 1fr 1fr
+          rows: [1, 1],       // 1fr 1fr
+          gap: 8
+        },
+        cells: [
+          { columnSpan: 3 },
+          {},
+          {},
+          {}
+        ]
+      },
+      {
+        name: '反双T型布局',
+        style: 'background: #fff;',
+        gridClass: 'grid-4-2t-shape',
+        gridConfig: {
+          columns: [1, 1, 1], // 1fr 1fr 1fr
+          rows: [1, 1],       // 1fr 1fr
+          gap: 8
+        },
+        cells: [
+          {},
+          {},
+          {},
+          { columnSpan: 3 }
+        ]
+      },
+      {
+        name: '左双T型布局',
+        style: 'background: #fff;',
+        gridClass: 'grid-4-2ft-shape',
+        gridConfig: {
+          columns: [1, 1], // 1fr 1fr
+          rows: [1, 1, 1], // 1fr 1fr 1fr
+          gap: 8
+        },
+        cells: [
+          { rowSpan: 3 },
+          {},
+          {},
+          {}
+        ]
+      },
+      {
+        name: '右双T型布局',
+        style: 'background: #fff;',
+        gridClass: 'grid-4-2ft-shape',
+        gridConfig: {
+          columns: [1, 1], // 1fr 1fr
+          rows: [1, 1, 1], // 1fr 1fr 1fr
+          gap: 8
+        },
+        cells: [
+          {},
+          { rowSpan: 3 },
+          {},
+          {}
+        ]
+      }
     ]
   },
 
@@ -271,7 +319,7 @@ Page({
   chooseImage() {
     const that = this
     const maxCount = 9 - this.data.selectedPhotos.length
-    
+
     if (maxCount <= 0) {
       wx.showToast({
         title: '最多选择9张照片',
@@ -289,14 +337,14 @@ Page({
       success(res) {
         const tempFiles = res.tempFiles.map(file => file.tempFilePath)
         const newPhotos = [...that.data.selectedPhotos, ...tempFiles]
-        
+
         that.setData({
           selectedPhotos: newPhotos
         })
-        
+
         // 保存到全局数据
         app.globalData.selectedPhotos = newPhotos
-        
+
         wx.showToast({
           title: `已选择${tempFiles.length}张照片`,
           icon: 'success'
@@ -317,11 +365,11 @@ Page({
     const index = e.currentTarget.dataset.index
     const photos = [...this.data.selectedPhotos]
     photos.splice(index, 1)
-    
+
     this.setData({
       selectedPhotos: photos
     })
-    
+
     // 更新全局数据
     app.globalData.selectedPhotos = photos
   },
@@ -332,7 +380,7 @@ Page({
     this.setData({
       currentTemplate: index
     })
-    
+
     // 保存到全局数据
     app.globalData.currentTemplate = this.data.templates[index]
   },

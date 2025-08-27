@@ -164,7 +164,7 @@
   gap: 8rpx;
 }
 
-/* T型布局 */
+/* 2T型布局 */
 .grid-template.grid-4-2t-shape {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -172,19 +172,11 @@
   gap: 8rpx;
 }
 
-/* 左右分割 */
-.grid-template.grid-4-left-right {
+/* 左2T型布局 */
+.grid-template.grid-4-2ft-shape {
   display: grid;
-  grid-template-columns: 2fr 1fr;
-  grid-template-rows: 3fr 1fr 1fr;
-  gap: 8rpx;
-}
-
-/* 上下分割 */
-.grid-template.grid-4-top-bottom {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: 2fr 1fr;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
   gap: 8rpx;
 }
 
