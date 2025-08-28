@@ -43,13 +43,31 @@
 
   <!-- 底部工具栏 -->
   <view class="bottom-toolbar">  
+    <scroll-view class="template-scroll" scroll-x="true">
+      <view class="template-item {{selectedLayoutIndex === index ? 'active' : ''}}" 
+            wx:for="{{filteredLayouts}}" 
+            wx:key="index"
+            bindtap="selectLayout"
+            data-index="{{index}}">
+        <view class="template-preview">
+          <view class="template-grid" style="{{item.style}}">
+            <view class="template-grid-cell {{cell.class}}" 
+                  wx:for="{{item.cells}}" 
+                  wx:for-item="cell" 
+                  wx:key="cellIndex"
+                  style="grid-column: span {{cell.columnSpan}}; grid-row: span {{cell.rowSpan}};">
+            </view>
+          </view>
+        </view>
+        <text class="template-name">{{item.name}}</text>
+      </view>
+    </scroll-view>
     <!-- 功能按钮 -->
     <view class="function-buttons">
       <view class="func-btn">
         <text class="func-label">布局</text>
       </view>
       <view class="func-btn">
-        <text class="func-label">边框</text>
       </view>
       <view class="func-btn save-btn" bindtap="savePuzzle">
         <text class="func-label">保存</text>

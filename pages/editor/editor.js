@@ -1,17 +1,6 @@
 // editor.js
 const app = getApp()
 
-// 动态生成CSS Grid样式
-function generateGridStyle(gridConfig) {
-  const { columns, rows, gap } = gridConfig;
-  
-  // 将数组转换为CSS Grid的fr单位
-  const gridTemplateColumns = columns.map(col => `${col}fr`).join(' ');
-  const gridTemplateRows = rows.map(row => `${row}fr`).join(' ');
-  
-  return `grid-template-columns: ${gridTemplateColumns}; grid-template-rows: ${gridTemplateRows}; gap: ${gap}rpx;`;
-}
-
 Page({
   data: {
     canvasWidth: 300,
@@ -28,6 +17,13 @@ Page({
     templateCount: 9, // 当前选择的模板数量
     filteredTemplates: [], // 过滤后的模板列表
     allTemplates: [], // 所有模板数据
+    
+    // 布局选择相关
+    showLayoutModal: false,
+    currentLayoutCategory: 'all',
+    selectedLayoutIndex: -1,
+    availableLayouts: [],
+    filteredLayouts: [],
     
     // 滤镜相关
     showFilterModal: false,
@@ -89,7 +85,10 @@ Page({
     this.loadPhotos()
     
     // 初始化模板数据
-    this.initTemplates()
+    // this.initTemplates()
+    
+    // 初始化布局数据
+    this.initLayoutData()
   },
 
   // 初始化画布
@@ -141,6 +140,9 @@ Page({
     
     // 初始化九宫格数据
     this.initGridLayout(selectedPhotos, template)
+    
+    // 更新布局显示
+    this.updateLayoutDisplay()
   },
 
   // 初始化九宫格布局
@@ -161,7 +163,7 @@ Page({
     const currentTemplate = template || defaultTemplate
     
     // 生成动态样式
-    const gridStyle = generateGridStyle(currentTemplate.gridConfig)
+    const gridStyle = this.generateGridStyle(currentTemplate.gridConfig)
     
     // 设置当前模板
     this.setData({
@@ -601,6 +603,9 @@ Page({
         remainingPhotos
       })
       
+      // 更新布局显示
+      this.updateLayoutDisplay()
+      
       wx.showToast({
         title: '照片已移除',
         icon: 'success',
@@ -1025,54 +1030,78 @@ Page({
   },
 
   // 初始化模板数据
-  initTemplates() {
-    // 这里可以从服务器或本地加载模板数据
-    const allTemplates = [
-      // 示例模板数据
-      {
-        id: 1,
-        name: '经典九宫格',
-        count: 9,
-        gridClass: 'grid-3x3',
-        gridConfig: {
-          columns: [1, 1, 1],
-          rows: [1, 1, 1],
-          gap: 8
-        },
-        cells: Array.from({length: 9}, (_, i) => ({
-          class: '',
-          columnSpan: 1,
-          rowSpan: 1
-        }))
-      },
-      {
-        id: 2,
-        name: '四宫格',
-        count: 4,
-        gridClass: 'grid-2x2',
-        gridConfig: {
-          columns: [1, 1],
-          rows: [1, 1],
-          gap: 8
-        },
-        cells: Array.from({length: 4}, (_, i) => ({
-          class: '',
-          columnSpan: 1,
-          rowSpan: 1
-        }))
-      }
-    ]
+  // initTemplates() {
+  //   // 这里可以从服务器或本地加载模板数据
+  //   const allTemplates = [
+  //     // 示例模板数据
+  //     {
+  //       id: 1,
+  //       name: '经典九宫格',
+  //       count: 9,
+  //       gridClass: 'grid-3x3',
+  //       gridConfig: {
+  //         columns: [1, 1, 1],
+  //         rows: [1, 1, 1],
+  //         gap: 8
+  //       },
+  //       cells: Array.from({length: 9}, (_, i) => ({
+  //         class: '',
+  //         columnSpan: 1,
+  //         rowSpan: 1
+  //       }))
+  //     },
+  //     {
+  //       id: 2,
+  //       name: '四宫格',
+  //       count: 4,
+  //       gridClass: 'grid-2x2',
+  //       gridConfig: {
+  //         columns: [1, 1],
+  //         rows: [1, 1],
+  //         gap: 8
+  //       },
+  //       cells: Array.from({length: 4}, (_, i) => ({
+  //         class: '',
+  //         columnSpan: 1,
+  //         rowSpan: 1
+  //       }))
+  //     }
+  //   ]
     
-    this.setData({
-      allTemplates,
-      filteredTemplates: allTemplates.filter(t => t.count === this.data.templateCount)
-    })
-  },
+  //   const { templateCount, gridCells } = this.data
+  //   const photoCount = gridCells.filter(cell => cell.photoSrc).length
+    
+  //   let filteredTemplates = allTemplates.filter(t => t.count === templateCount)
+    
+  //   // 根据图片数量过滤模板
+  //   if (photoCount > 0) {
+  //     filteredTemplates = filteredTemplates.filter(template => {
+  //       const cellCount = template.cells ? template.cells.length : 0
+  //       return cellCount >= photoCount
+  //     })
+  //   }
+    
+  //   this.setData({
+  //     allTemplates,
+  //     filteredTemplates
+  //   })
+  // },
 
   // 模板数量选择
   onTemplateCountChange(e) {
     const count = parseInt(e.detail.value)
-    const filteredTemplates = this.data.allTemplates.filter(t => t.count === count)
+    const { allTemplates, gridCells } = this.data
+    const photoCount = gridCells.filter(cell => cell.photoSrc).length
+    
+    let filteredTemplates = allTemplates.filter(t => t.count === count)
+    
+    // 根据图片数量过滤模板
+    if (photoCount > 0) {
+      filteredTemplates = filteredTemplates.filter(template => {
+        const cellCount = template.cells ? template.cells.length : 0
+        return cellCount >= photoCount
+      })
+    }
     
     this.setData({
       templateCount: count,
@@ -1097,8 +1126,185 @@ Page({
     }
   },
 
+  // 更新布局显示（根据图片数量）
+  updateLayoutDisplay() {
+    const { allTemplates, gridCells, templateCount } = this.data
+    const photoCount = gridCells.filter(cell => cell.photoSrc).length
+    
+    let filteredTemplates = allTemplates.filter(t => t.count === templateCount)
+    
+    // 根据图片数量过滤模板
+    if (photoCount > 0) {
+      filteredTemplates = filteredTemplates.filter(template => {
+        const cellCount = template.cells ? template.cells.length : 0
+        return cellCount >= photoCount
+      })
+    }
+    
+    this.setData({
+      filteredTemplates
+    })
+  },
+
   // 返回
   goBack() {
     wx.navigateBack()
-  }
+  },
+
+  // 初始化布局数据
+  initLayoutData() {
+    // 从共享模板数据文件获取模板数据
+    const { templates } = require('../../utils/templates')
+    
+    // 为每个模板生成样式
+    const templatesWithStyle = templates.map(template => {
+      const gridStyle = this.generateGridStyle(template.gridConfig)
+      return {
+        ...template,
+        style: `background: #fff; ${gridStyle}`
+      }
+    })
+    
+    this.setData({
+      availableLayouts: templatesWithStyle,
+      filteredLayouts: templatesWithStyle
+    })
+  },
+
+  // 动态生成CSS Grid样式
+  generateGridStyle(gridConfig) {
+    const { columns, rows, gap } = gridConfig;
+    
+    // 将数组转换为CSS Grid的fr单位
+    const gridTemplateColumns = columns.map(col => `${col}fr`).join(' ');
+    const gridTemplateRows = rows.map(row => `${row}fr`).join(' ');
+    
+    return `grid-template-columns: ${gridTemplateColumns}; grid-template-rows: ${gridTemplateRows}; gap: ${gap}rpx;`;
+  },
+
+  // 显示布局选择模态框
+  showLayoutModal() {
+    const { availableLayouts, gridCells } = this.data
+    const photoCount = gridCells.filter(cell => cell.photoSrc).length
+    
+    // 根据图片数量过滤布局
+    let filteredLayouts = availableLayouts
+    if (photoCount > 0) {
+      filteredLayouts = availableLayouts.filter(layout => {
+        const cellCount = layout.cells ? layout.cells.length : 0
+        return cellCount >= photoCount
+      })
+    }
+    
+    this.setData({
+      showLayoutModal: true,
+      filteredLayouts,
+      currentLayoutCategory: 'all'
+    })
+  },
+
+  // 关闭布局选择模态框
+  closeLayoutModal() {
+    this.setData({
+      showLayoutModal: false,
+      selectedLayoutIndex: -1
+    })
+  },
+
+  // 选择布局分类
+  selectLayoutCategory(e) {
+    const category = e.currentTarget.dataset.category
+    const { availableLayouts, gridCells } = this.data
+    const photoCount = gridCells.filter(cell => cell.photoSrc).length
+    
+    let filteredLayouts = category === 'all' 
+      ? availableLayouts 
+      : availableLayouts.filter(layout => layout.category === category)
+    
+    // 根据图片数量过滤布局
+    if (photoCount > 0) {
+      filteredLayouts = filteredLayouts.filter(layout => {
+        const cellCount = layout.cells ? layout.cells.length : 0
+        return cellCount >= photoCount
+      })
+    }
+    
+    this.setData({
+      currentLayoutCategory: category,
+      filteredLayouts
+    })
+  },
+
+  // 选择布局
+  selectLayout(e) {
+    const layoutIndex = e.currentTarget.dataset.index
+    const selectedLayout = this.data.filteredLayouts[layoutIndex]
+    
+    if (selectedLayout) {
+      this.setData({
+        selectedLayoutIndex: layoutIndex
+      })
+      
+      // 直接应用布局
+      this.applyLayout(selectedLayout)
+    }
+  },
+
+  // 确认布局更改
+  confirmLayoutChange() {
+    const { selectedLayoutIndex, filteredLayouts } = this.data
+    if (selectedLayoutIndex >= 0) {
+      const selectedLayout = filteredLayouts[selectedLayoutIndex]
+      this.applyLayout(selectedLayout)
+    }
+    this.closeLayoutModal()
+  },
+
+  // 应用布局
+  applyLayout(layout) {
+    const gridStyle = this.generateGridStyle(layout.gridConfig)
+    
+    // 收集当前所有的图片
+    const currentPhotos = this.data.gridCells
+      .filter(cell => cell.photoSrc)
+      .map(cell => ({
+        photoSrc: cell.photoSrc,
+        originalPhotoSrc: cell.originalPhotoSrc || cell.photoSrc
+      }))
+    
+    // 创建新的格子布局
+    const newGridCells = layout.cells.map((cell, index) => {
+      const photo = currentPhotos[index] || null
+      return {
+        ...cell,
+        index: index,
+        photoSrc: photo ? photo.photoSrc : '',
+        originalPhotoSrc: photo ? photo.originalPhotoSrc : '',
+        class: cell.class || ''
+      }
+    })
+    
+    // 计算剩余的图片
+    const remainingPhotos = currentPhotos.slice(layout.cells.length).map(photo => photo.photoSrc)
+    
+    // 完整更新currentTemplate对象
+    const newCurrentTemplate = {
+      ...layout,
+      style: `background: #fff; ${gridStyle}`
+    }
+    
+    this.setData({
+      currentTemplate: newCurrentTemplate,
+      gridCells: newGridCells,
+      remainingPhotos: remainingPhotos
+    })
+    
+    // 更新布局显示
+    this.updateLayoutDisplay()
+    
+    wx.showToast({
+      title: '布局已应用',
+      icon: 'success'
+    })
+  },
 })

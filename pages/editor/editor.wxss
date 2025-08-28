@@ -239,7 +239,7 @@
   height: 120rpx;
 }
 
-.template-item {
+/* .template-item {
   display: inline-block;
   width: 100rpx;
   height: 100rpx;
@@ -262,13 +262,72 @@
   gap: 2rpx;
   padding: 4rpx;
   background: #f8f9fa;
-}
+} */
 
 .preview-cell {
   background: #007aff;
   border-radius: 2rpx;
   opacity: 0.8;
 }
+
+/* 模板选择样式 */
+.template-scroll {
+  white-space: nowrap;
+  width: 100%;
+  overflow-x: auto;
+  padding: 20rpx 0;
+}
+
+.template-item {
+  display: inline-block;
+  margin-right: 20rpx;
+  vertical-align: top;
+  text-align: center;
+  width: 120rpx;
+}
+
+.template-item:last-child {
+  margin-right: 0;
+}
+
+.template-item.active .template-preview {
+  border-color: #007AFF;
+  border-width: 4rpx;
+}
+
+.template-preview {
+  width: 120rpx;
+  height: 120rpx;
+  background: #fff;
+  border: 2rpx solid #e0e0e0;
+  border-radius: 12rpx;
+  margin-bottom: 8rpx;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.template-grid {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  padding: 6rpx;
+  gap: 2rpx;
+}
+
+.template-grid-cell {
+  background: rgba(0, 122, 255, 0.8);
+  border-radius: 2rpx;
+}
+
+.template-name {
+  font-size: 24rpx;
+  color: #333;
+  display: block;
+}
+
+
 
 /* 功能按钮 */
 .function-buttons {
