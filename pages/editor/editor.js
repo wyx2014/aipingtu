@@ -25,17 +25,6 @@ Page({
     availableLayouts: [],
     filteredLayouts: [],
     
-    // 滤镜相关
-    showFilterModal: false,
-    currentFilter: 'none',
-    filters: [
-      { name: 'none', label: '原图', style: 'background: linear-gradient(45deg, #ff6b6b, #4ecdc4);' },
-      { name: 'vintage', label: '复古', style: 'background: linear-gradient(45deg, #d4a574, #8b4513); filter: sepia(0.5);' },
-      { name: 'bw', label: '黑白', style: 'background: linear-gradient(45deg, #666, #ccc); filter: grayscale(1);' },
-      { name: 'warm', label: '暖色', style: 'background: linear-gradient(45deg, #ff9a56, #ff6b35); filter: hue-rotate(30deg);' },
-      { name: 'cool', label: '冷色', style: 'background: linear-gradient(45deg, #74b9ff, #0984e3); filter: hue-rotate(-30deg);' }
-    ],
-    
     // 文字相关
     showTextModal: false,
     textContent: '',
@@ -688,59 +677,6 @@ Page({
   closeTextModal() {
     this.setData({
       showTextModal: false
-    })
-  },
-
-  // 应用滤镜
-  applyFilter() {
-    this.setData({
-      showFilterModal: true
-    })
-  },
-
-  // 选择滤镜
-  selectFilter(e) {
-    const filter = e.currentTarget.dataset.filter
-    this.setData({
-      currentFilter: filter,
-      showFilterModal: false
-    })
-    
-    // 这里可以实现滤镜效果
-    wx.showToast({
-      title: `已应用${this.data.filters.find(f => f.name === filter).label}滤镜`,
-      icon: 'success'
-    })
-  },
-
-  // 关闭滤镜模态框
-  closeFilterModal() {
-    this.setData({
-      showFilterModal: false
-    })
-  },
-
-  // 调整背景
-  adjustBackground() {
-    wx.showActionSheet({
-      itemList: ['白色背景', '透明背景', '渐变背景', '自定义颜色'],
-      success: (res) => {
-        const backgrounds = ['#ffffff', 'transparent', 'linear-gradient(45deg, #ff6b6b, #4ecdc4)', '#custom']
-        const selected = backgrounds[res.tapIndex]
-        
-        if (selected === '#custom') {
-          // 这里可以打开颜色选择器
-          wx.showToast({
-            title: '自定义颜色功能开发中',
-            icon: 'none'
-          })
-        } else {
-          wx.showToast({
-            title: '背景已更改',
-            icon: 'success'
-          })
-        }
-      }
     })
   },
 

@@ -59,7 +59,7 @@
             </view>
           </view>
         </view>
-        <text class="template-name">{{item.name}}</text>
+        <!-- <text class="template-name">{{item.name}}</text> -->
       </view>
     </scroll-view>
     <!-- 功能按钮 -->
